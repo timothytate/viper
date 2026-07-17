@@ -60,8 +60,6 @@ A VIPER demo project based on the Day 6 research scenario. This file is already 
 - Activity including Sandcat RAT initial access, SMB-based tool transfer, lateral movement, service creation for persistence, and process injection.
 - Network, service, and process-injection event records.
 
-These JSON files are **VIPER project files**, not raw CALDERA full-report exports. They were prepared so they can be loaded directly into VIPER through the **Import Project** button.
-
 ## Quick Start
 
 ### Option 1: Open Locally
