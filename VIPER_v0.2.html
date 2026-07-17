@@ -1,0 +1,1262 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIPER v0.2</title>
+    <style>
+        :root {
+            --bg-color: #121212; --panel-bg: #1e1e1e; --text-main: #e0e0e0;
+            --accent: #4fc3f7; --external-color: #ff1744; --internal-color: #ffa726;
+            --discovery-color: #00e676; --node-bg: #263238; --node-border: #37474f;
+            --success: #81c784; --danger: #e57373; --tab-inactive: #2c2c2c;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 15px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; overflow: hidden;}
+        header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 2px solid var(--panel-bg); }
+        .header-left h1 { margin: 0; font-size: 1.5rem; color: var(--accent); text-transform: uppercase; transition: color 0.3s;}
+        .header-left .sub-title { font-size: 0.8rem; color: #999; margin: 0; font-weight: normal; }
+        .header-right { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end;}
+        
+        #main-layout { display: flex; flex-grow: 1; gap: 20px; overflow: hidden; }
+        #visualizer-column { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; transition: all 0.3s ease; }
+        
+        #map-container { position: relative; flex-grow: 1; background-color: #050505; border: 2px solid var(--panel-bg); border-radius: 8px; overflow: hidden; cursor: grab; }
+        #map-container:active { cursor: grabbing; }
+        
+        #map-workspace { 
+            position: absolute; top: -100%; left: -100%; width: 300%; height: 300%; 
+            transform-origin: center center; 
+            background-color: #0a0a0a;
+            background-image: linear-gradient(#1e1e1e 1px, transparent 1px), linear-gradient(90deg, #1e1e1e 1px, transparent 1px); 
+            background-size: 30px 30px; 
+            border: 2px dashed #333;
+        }
+        .anim-transform { transition: transform 0.3s ease-out; }
+        
+        #map-tools { position: absolute; top: 10px; right: 10px; z-index: 100; display: flex; gap: 5px; background: rgba(30,30,30,0.8); padding: 5px; border-radius: 6px; border: 1px solid var(--node-border); }
+        #map-tools button { padding: 4px 10px; font-size: 1rem; }
+        #svg-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+        .node { position: absolute; background-color: var(--node-bg); border: 2px solid var(--node-border); padding: 8px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.4); z-index: 10; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 3px; color: #fff; cursor: grab; user-select: none; transition: all 0.2s ease;}
+        .node:active { cursor: grabbing; border-color: var(--accent); }
+        .node:hover { border-color: var(--accent); }
+        .node svg { width: 32px; height: 32px; fill: var(--accent); pointer-events: none; }
+        .node-ip { color: var(--accent); font-family: monospace; font-size: 0.7rem; pointer-events: none; }
+        .node-host { pointer-events: none; }
+        .node.active-primary { border-color: var(--discovery-color) !important; box-shadow: 0 0 15px rgba(0, 230, 118, 0.6) !important; }
+        .node.active-secondary { border-color: var(--external-color) !important; box-shadow: 0 0 15px rgba(255, 23, 68, 0.6) !important; }
+        
+        #details-panel { background-color: var(--panel-bg); padding: 15px; margin-top: 15px; border-radius: 8px; border-left: 5px solid var(--accent); display: flex; flex-direction: column; gap: 8px; overflow-y: auto; max-height: 200px;}
+        .meta-data { display: flex; flex-wrap: wrap; gap: 15px; font-family: monospace; background: #121212; padding: 10px; border-radius: 4px; color: #a5d6a7; }
+        .event-data-box { background: #0a0a0a; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 0.85rem; color: #fff; border-left: 3px solid var(--internal-color); margin-top: 5px;}
+        .tactic-badge { display: inline-block; background-color: #37474f; color: #e0e0e0; padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-left: 10px;}
+        
+        #controls { display: flex; justify-content: space-between; margin-top: 15px; }
+        /* Full Screen Views */
+        .fullscreen-view { display: none; flex-grow: 1; background-color: var(--panel-bg); border-radius: 8px; padding: 20px; overflow-y: auto; border: 2px solid var(--node-border); }
+        
+        /* Ledger */
+        .ledger-item { background: var(--bg-color); border: 1px solid var(--node-border); padding: 15px; border-radius: 6px; margin-bottom: 12px; border-left: 4px solid var(--accent); cursor: pointer; transition: border-color 0.2s;}
+        .ledger-item:hover { border-color: var(--accent); }
+        .ledger-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; font-weight: bold; font-size: 1.1rem;}
+        .ledger-body { font-size: 0.95rem; color: #e0e0e0; margin-top: 4px;}
+        .ledger-event { font-family: monospace; font-size: 0.85rem; background: #0a0a0a; padding: 8px; margin-top: 8px; border-radius: 4px; color: #a5d6a7;}
+        /* Reports */
+        #reports-container { display: none; gap: 20px; }
+        #report-list-panel { flex: 0 0 300px; background: var(--bg-color); padding: 15px; border-radius: 8px; border: 1px solid var(--node-border); display: flex; flex-direction: column;}
+        #report-list { overflow-y: auto; flex-grow: 1; margin-top: 10px; }
+        #report-detail-panel { flex: 1; background: var(--bg-color); padding: 20px; border-radius: 8px; border: 1px solid var(--node-border); display: flex; flex-direction: column; overflow-y: auto;}
+        .report-item { padding: 10px; border-bottom: 1px solid #333; cursor: pointer; font-weight: bold;}
+        .report-item:hover { background: var(--panel-bg); color: var(--accent); }
+        .report-item.active { border-left: 4px solid var(--accent); background: var(--panel-bg); }
+        
+        #report-search { width: 100%; background: #121212; color: #fff; border: 1px solid var(--node-border); padding: 8px; border-radius: 4px; box-sizing: border-box; margin-bottom: 10px; }
+        
+        /* Living Document Elements */
+        .editor-toolbar { display: flex; gap: 5px; background: #2c2c2c; padding: 5px; border-radius: 4px 4px 0 0; border: 1px solid var(--node-border); border-bottom: none;}
+        .editor-toolbar button { padding: 4px 8px; font-size: 0.8rem; background: #3c3c3c; border: 1px solid #555; }
+        .editor-toolbar button:hover { background: var(--accent); color: #000; }
+        .wysiwyg-editor { background: #121212; border: 1px solid var(--node-border); border-radius: 0 0 4px 4px; padding: 15px; color: #fff; font-family: inherit; overflow-y: auto; flex: 1; min-height: 300px;}
+        .wysiwyg-editor:focus { outline: none; border-color: var(--accent); }
+        .wysiwyg-editor table, #report-view-mode table { width: 100%; border-collapse: collapse; margin-bottom: 10px; background: #1a1a1a; }
+        .wysiwyg-editor th, .wysiwyg-editor td, #report-view-mode th, #report-view-mode td { border: 1px solid #555; padding: 8px; text-align: left; }
+        .wysiwyg-editor h1, #report-view-mode h1, .wysiwyg-editor h2, #report-view-mode h2, .wysiwyg-editor h3, #report-view-mode h3 { color: var(--accent); margin-top: 0; }
+        #report-view-mode { display: none; background: #121212; border: 1px solid var(--node-border); border-radius: 4px; padding: 15px; overflow-y: auto; flex: 1; min-height: 300px; }
+        /* Right Panel */
+        #editor-column { flex: 0 0 450px; width: 450px; background-color: var(--panel-bg); border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; border-left: 2px solid var(--node-border); transition: all 0.3s ease; opacity: 1; }
+        #editor-column.collapsed { flex: 0 0 0px; width: 0px; min-width: 0; padding: 0; border: none; opacity: 0; margin-left: -20px; pointer-events: none; }
+        .tabs { display: flex; background: var(--tab-inactive); border-bottom: 2px solid var(--node-border); }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: #888; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.85rem;}
+        .tab-btn.active { background: var(--panel-bg); color: var(--accent); border-bottom: 2px solid var(--accent); }
+        .tab-content { display: none; padding: 20px; overflow-y: auto; flex-grow: 1; }
+        .tab-content.active { display: flex; flex-direction: column; }
+        .form-group { margin-bottom: 12px; display: flex; flex-direction: column; }
+        .form-group label { font-size: 0.8rem; margin-bottom: 4px; color: #b0bec5; font-weight: bold;}
+        .form-group input, .form-group select, .form-group textarea { background-color: #121212; color: #fff; border: 1px solid var(--node-border); padding: 6px 8px; border-radius: 4px; font-family: inherit; font-size: 0.85rem;}
+        .form-row { display: flex; gap: 10px; }
+        .form-row .form-group { flex: 1; }
+        .editor-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+        
+        button { background-color: var(--node-bg); color: var(--text-main); border: 1px solid var(--accent); padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: all 0.2s;}
+        button:hover:not(:disabled) { background-color: var(--accent); color: #000; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; border-color: #555; }
+        .btn-success { border-color: var(--success); color: var(--success); }
+        .btn-success:hover:not(:disabled) { background-color: var(--success); color: #000; }
+        .btn-danger { border-color: var(--danger); color: var(--danger); }
+        .btn-danger:hover:not(:disabled) { background-color: var(--danger); color: #000; }
+        .btn-warning { border-color: var(--internal-color); color: var(--internal-color); }
+        .btn-warning:hover:not(:disabled) { background-color: var(--internal-color); color: #000; }
+        .btn-purple { border-color: #ce93d8; color: #ce93d8; }
+        .btn-purple:hover:not(:disabled) { background-color: #ce93d8; color: #000; }
+        .btn-flex { flex: 1; min-width: 45%; font-size: 0.8rem; }
+        
+        .tag-badge { background-color: #37474f; color: #e0e0e0; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; margin: 2px;}
+        .tag-remove { color: var(--danger); cursor: pointer; font-size: 1.1rem; line-height: 0.5; font-weight: bold;}
+        .tag-remove:hover { color: #fff; }
+        .dynamic-fields { border-left: 2px solid var(--accent); padding-left: 10px; margin-bottom: 12px; background: #161c1e; padding: 10px; border-radius: 4px; display: none; }
+        
+        .path-line { fill: none; stroke-width: 4; stroke-dasharray: 10, 10; animation: flow 1s linear infinite; }
+        .path-external { stroke: var(--external-color); }
+        .path-internal { stroke: var(--internal-color); }
+        @keyframes flow { from { stroke-dashoffset: 20; } to { stroke-dashoffset: 0; } }
+        
+        .pulse-circle { fill: none; stroke-width: 5; animation: pulse 1.5s ease-out infinite; }
+        .pulse-red { stroke: var(--external-color); fill: rgba(255, 23, 68, 0.2); }
+        .pulse-green { stroke: var(--discovery-color); fill: rgba(0, 230, 118, 0.2); }
+        .pulse-orange { stroke: var(--internal-color); fill: rgba(255, 167, 38, 0.2); }
+        @keyframes pulse { 0% { r: 20; opacity: 1; } 100% { r: 70; opacity: 0; } }
+        
+        #empty-state { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #555; font-size: 1.5rem; font-weight: bold; text-align: center; pointer-events: none; }
+        #node-list { border: 1px solid var(--node-border); border-radius: 4px; max-height: 120px; overflow-y: auto; margin-bottom: 15px; background: #121212; }
+        .node-item { padding: 6px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; cursor: pointer; font-size: 0.8rem; }
+        .node-item:hover { background: var(--node-bg); }
+        
+        .related-report-link { display: block; padding: 5px; background: #1a1a1a; border-left: 3px solid var(--accent); margin-top: 5px; cursor: pointer; font-size: 0.8rem; color: #a5d6a7;}
+        .related-report-link:hover { background: #333; }
+    </style>
+</head>
+<body>
+    <svg style="display: none;">
+        <defs>
+            <path id="icon-cloud" d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+            <path id="icon-server" d="M4 3h16v4H4zm0 6h16v4H4zm0 6h16v4H4zm2-10h2v2H6zm0 6h2v2H6zm0 6h2v2H6z"/>
+            <path id="icon-laptop" d="M20 18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/>
+            <path id="icon-network" d="M16 11V5H8v6H2v8h6v-6h8v6h6v-8h-6zm-6-4h4v2h-4V7zm-6 8h4v2H4v-2zm12 0h4v2h-4v-2z"/>
+            <path id="icon-antenna" d="M12 11c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 2c0-3.31-2.69-6-6-6s-6 2.69-6 6c0 2.22 1.21 4.15 3 5.19l1-1.74c-1.19-.7-2-1.97-2-3.45 0-2.21 1.79-4 4-4s4 1.79 4 4c0 1.48-.81 2.75-2 3.45l1 1.74c1.79-1.04 3-2.97 3-5.19zM12 3C8.13 3 5 6.13 5 10c0 2.66 1.48 4.97 3.65 6.22l1-1.73C8.11 13.56 7 11.9 7 10c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.9-1.11 3.56-2.65 4.49l1 1.73C17.52 14.97 19 12.66 19 10c0-3.87-3.13-7-7-7z"/>
+            <path id="icon-plc" d="M3 3h18v18H3V3zm4 4h2v2H7V7zm4 0h2v2h-2V7zm4 0h2v2h-2V7zm-8 4h2v2H7v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2z"/>
+            <path id="icon-hmi" d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H3V4h18v10z"/>
+            <path id="icon-database" d="M12 2C6.48 2 2 4.02 2 6.5v11C2 19.98 6.48 22 12 22s10-2.02 10-4.5v-11C22 4.02 17.52 2 12 2zm0 3c4.42 0 8 1.12 8 2.5s-3.58 2.5-8 2.5-8-1.12-8-2.5S7.58 5 12 5zm0 15c-4.42 0-8-1.12-8-2.5V15.1c2.14 1.18 4.93 1.9 8 1.9s5.86-.72 8-1.9v2.4c0 1.38-3.58 2.5-8 2.5zm0-4.5c-3.07 0-5.86-.72-8-1.9v-2.4c2.14 1.18 4.93 1.9 8 1.9s5.86-.72 8-1.9v2.4c-2.14 1.18-4.93 1.9-8 1.9z"/>
+            <path id="icon-firewall" d="M19.96 4H4.04C2.92 4 2.01 4.9 2.01 6L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-1.8 14H5.84v-2h12.32v2zm0-4H5.84v-2h12.32v2zm0-4H5.84V8h12.32v2zM12 6h2v2h-2zm-4 0h2v2H8zm8 0h2v2h-2z"/>
+        </defs>
+    </svg>
+    <header>
+        <div class="header-left">
+            <h1 id="main-title">VIPER</h1>
+            <div class="sub-title">Visual Infrastructure Picture & Endpoint Response</div>
+        </div>
+        <div class="header-right">
+            <button onclick="switchMainView('map')" class="btn-success">Map View</button>
+            <button onclick="switchMainView('ledger')" class="btn-warning">Ledger View</button>
+            <button onclick="switchMainView('reports')" class="btn-purple">Reports</button>
+            <div style="width: 2px; background: #333; margin: 0 5px;"></div>
+            <button id="btn-toggle-editor" class="btn-warning">Toggle Panel</button>
+            <input type="file" id="upload-csv" accept=".csv" style="display: none;">
+            <input type="file" id="upload-json" accept=".json" style="display: none;">
+            <button id="btn-import-csv" class="btn-success">Import CSV</button>
+            <button id="btn-import-json" class="btn-success">Import Project</button>
+            <button id="btn-export-json" class="btn-success">Export Project</button>
+            <button onclick="exportStix()" class="btn-success" style="margin-left: 5px;">Export STIX</button>
+        </div>
+    </header>
+    <div id="main-layout">
+        <div id="visualizer-column">
+            
+            <div id="map-container">
+                <div id="map-tools">
+                    <button onclick="setZoom(0.2)">➕</button>
+                    <button onclick="setZoom(-0.2)">➖</button>
+                    <button onclick="resetZoomPan()" style="font-size: 0.8rem;">Reset View</button>
+                </div>
+                <div id="empty-state">Blank Canvas.<br><span style="font-size: 1rem">Add Infrastructure -> Add Steps</span></div>
+                <div id="map-workspace" class="anim-transform">
+                    <svg id="svg-layer"></svg>
+                </div>
+            </div>
+            
+            <div id="details-panel">
+                <div>
+                    <strong id="step-counter" style="color: var(--accent);">Step 0 of 0</strong> 
+                    - <span id="step-title" style="font-size: 1.1rem; font-weight: bold;">--</span>
+                    <span id="step-tactic" class="tactic-badge" style="display: none;"></span>
+                </div>
+                <div id="step-desc" style="font-size: 0.9rem;">--</div>
+                <div class="meta-data">
+                    <span id="meta-time">Time: --</span>
+                    <span id="meta-action">Action: --</span>
+                    <span id="meta-raw">Raw: --</span>
+                </div>
+                <div id="event-data-container" class="event-data-box" style="display: none;"></div>
+            </div>
+            
+            <div id="controls">
+                <button id="btn-prev" disabled>Previous Step</button>
+                <button id="btn-next" disabled>Next Step</button>
+            </div>
+            <div id="ledger-container" class="fullscreen-view">
+                <div id="ledger-list"></div>
+                <p id="ledger-empty" style="color: #666; text-align: center; margin-top: 20px;">No steps available.</p>
+            </div>
+            <!-- REPORTS VIEW -->
+            <div id="reports-container" class="fullscreen-view">
+                <div id="report-list-panel">
+                    <h3 style="margin-top:0; color: var(--accent);">Reports</h3>
+                    <button onclick="createNewReport()" class="btn-success" style="width: 100%; margin-bottom: 15px;">+ Create Report</button>
+                    <input type="text" id="report-search" placeholder="Search reports..." onkeyup="filterReports()">
+                    <div id="report-list"></div>
+                    <p id="report-empty" style="color: #666; text-align: center; margin-top: 20px;">No reports created.</p>
+                </div>
+                
+                <div id="report-detail-panel" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.8rem; color: #888;">Report Title</label>
+                            <input type="text" id="report-title" style="width: 100%; background: #121212; color: #fff; border: 1px solid var(--node-border); padding: 8px; border-radius: 4px; font-size: 1.2rem; font-weight: bold;" onchange="saveReportMeta()">
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center; margin-left: 15px;">
+                            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: #e57373; font-weight: bold; margin-right: 10px;">
+                                <input type="checkbox" id="report-lock" onchange="toggleReportLock(true)"> 🔒 Locked
+                            </label>
+                            <button onclick="downloadMarkdown()" class="btn-purple">Download Doc (.md)</button>
+                            <button onclick="deleteReport()" class="btn-danger">Delete</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Observables & Tags (IPs, Hostnames, etc.)</label>
+                        <div style="display: flex; gap: 5px; margin-bottom: 5px;">
+                            <input type="text" id="report-tag-input" placeholder="e.g. 192.168.1.5 or WIN-SRV-01" style="flex: 1;">
+                            <button type="button" onclick="addReportTag()" class="btn-warning">Tag</button>
+                        </div>
+                        <div id="report-tag-container" style="display: flex; flex-wrap: wrap; padding: 4px; background: #0a0a0a; border: 1px solid var(--node-border); border-radius: 4px; min-height: 32px;"></div>
+                    </div>
+                    <h4 style="border-bottom: 1px solid #333; padding-bottom: 5px; margin-top: 20px;">Living Document</h4>
+                    
+                    <!-- EDIT MODE -->
+                    <div id="report-edit-mode" style="display: flex; flex-direction: column; flex: 1;">
+                        <div class="editor-toolbar">
+                            <button onclick="document.execCommand('bold', false, null)"><b>B</b></button>
+                            <button onclick="document.execCommand('italic', false, null)"><i>I</i></button>
+                            <button onclick="document.execCommand('underline', false, null)"><u>U</u></button>
+                            <button onclick="document.execCommand('formatBlock', false, 'H1')">H1</button>
+                            <button onclick="document.execCommand('formatBlock', false, 'H2')">H2</button>
+                            <button onclick="document.execCommand('formatBlock', false, 'H3')">H3</button>
+                            <button onclick="document.execCommand('insertUnorderedList', false, null)">List</button>
+                            <button onclick="insertTable()" title="Insert Table">Table</button>
+                        </div>
+                        <div id="report-editor" contenteditable="true" class="wysiwyg-editor" placeholder="Start typing your report here..." onkeyup="saveReportContent()" onblur="saveReportContent()"></div>
+                    </div>
+                    <!-- VIEW MODE -->
+                    <div id="report-view-mode"></div>
+                </div>
+            </div>
+        </div>
+        <div id="editor-column">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('steps')">Attack Steps</button>
+                <button class="tab-btn" onclick="switchTab('nodes')">Infrastructure</button>
+            </div>
+            <div id="tab-nodes" class="tab-content">
+                <div id="node-list"></div>
+                
+                <div id="node-related-reports" style="display: none; margin-bottom: 15px; border: 1px solid var(--accent); padding: 10px; border-radius: 6px; background: #121212;">
+                    <h4 style="margin: 0 0 10px 0; color: var(--accent); font-size: 0.9rem;">Related Reports</h4>
+                    <div id="node-reports-list"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Hostname</label><input type="text" id="node-host"></div>
+                    <div class="form-group"><label>Primary IP Address</label><input type="text" id="node-ip"></div>
+                </div>
+                
+                <!-- NEW: OTHER IPS -->
+                <div class="form-group">
+                    <label>Other IPs (Aliases / Multi-homed)</label>
+                    <div style="display: flex; gap: 5px; margin-bottom: 5px;">
+                        <input type="text" id="node-other-ip-input" placeholder="e.g. 10.0.0.5" style="flex: 1;">
+                        <button type="button" onclick="addNodeOtherIp()" class="btn-warning" style="padding: 4px 10px;">Add</button>
+                    </div>
+                    <div id="node-other-ips-container" style="display: flex; flex-wrap: wrap; min-height: 28px; padding: 4px; background: #0a0a0a; border: 1px solid var(--node-border); border-radius: 4px;"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group"><label>Device Type (Icon)</label>
+                        <select id="node-icon">
+                            <option value="icon-server">Server</option>
+                            <option value="icon-laptop">Workstation / Laptop</option>
+                            <option value="icon-network">Network Switch/Router</option>
+                            <option value="icon-firewall">Firewall</option>
+                            <option value="icon-database">Database</option>
+                            <option value="icon-cloud">Cloud (External/C2)</option>
+                            <option value="icon-antenna">Antenna (OT)</option>
+                            <option value="icon-plc">PLC (OT)</option>
+                            <option value="icon-hmi">HMI (OT)</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>OS</label><input type="text" id="node-os"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Associated CVEs</label>
+                    <div style="display: flex; gap: 5px; margin-bottom: 5px;">
+                        <input type="text" id="node-cve-input" placeholder="e.g. CVE-2021-44228" style="flex: 1;">
+                        <button type="button" id="btn-add-cve" class="btn-warning" style="padding: 4px 10px;">Add</button>
+                    </div>
+                    <div id="node-cve-container" style="display: flex; flex-wrap: wrap; min-height: 28px; padding: 4px; background: #0a0a0a; border: 1px solid var(--node-border); border-radius: 4px;"></div>
+                </div>
+                <div class="form-group">
+                    <label>Device Notes</label>
+                    <textarea id="node-notes" rows="3"></textarea>
+                </div>
+                <div class="form-row" style="display:none;">
+                    <input type="number" id="node-x" value="50"><input type="number" id="node-y" value="50">
+                </div>
+                <div class="editor-actions">
+                    <button id="btn-save-node" class="btn-success btn-flex">Save / Add Node</button>
+                    <button id="btn-delete-node" class="btn-danger btn-flex">Delete Selected</button>
+                    <button id="btn-clear-node" class="btn-flex" style="width: 100%">Clear Selection</button>
+                </div>
+            </div>
+            <div id="tab-steps" class="tab-content active">
+                <div class="form-group"><label>Step Title</label><input type="text" id="edit-title"></div>
+                
+                <div class="form-row">
+                    <div class="form-group"><label>Date</label><input type="date" id="edit-date"></div>
+                    <div class="form-group"><label>Time (24h HH:MM:SS.sss)</label><input type="text" id="edit-time" placeholder="14:30:00.000"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>MITRE Tactic</label>
+                        <select id="edit-tactic">
+                            <option value="">-- Optional --</option>
+                            <option value="Reconnaissance">Reconnaissance</option>
+                            <option value="Resource Development">Resource Development</option>
+                            <option value="Initial Access">Initial Access</option>
+                            <option value="Execution">Execution</option>
+                            <option value="Persistence">Persistence</option>
+                            <option value="Privilege Escalation">Privilege Escalation</option>
+                            <option value="Stealth">Stealth</option>
+                            <option value="Defense Impairment">Defense Impairment</option>
+                            <option value="Credential Access">Credential Access</option>
+                            <option value="Discovery">Discovery</option>
+                            <option value="Lateral Movement">Lateral Movement</option>
+                            <option value="Collection">Collection</option>
+                            <option value="Command and Control">Command and Control</option>
+                            <option value="Exfiltration">Exfiltration</option>
+                            <option value="Impact">Impact</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Technique/Action</label><input type="text" id="edit-action"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Primary Node</label><select id="edit-node1"></select></div>
+                    <div class="form-group"><label>Secondary Node</label><select id="edit-node2"></select></div>
+                </div>
+                <div class="form-group">
+                    <label>Action Visual Type</label>
+                    <select id="edit-type">
+                        <option value="local">Execution/Local (Red Pulse)</option>
+                        <option value="discovery">Discovery (Green Pulse)</option>
+                        <option value="file_event">File Event (Orange Pulse)</option>
+                        <option value="internal">Internal Movement (Orange Line)</option>
+                        <option value="staging">Staging (Orange Line + Orange Pulse on Sec. Node)</option>
+                        <option value="external">External/C2 (Red Line)</option>
+                        <option value="exfil">Exfiltration (Red Line + Orange Pulse on Sec. Node)</option>
+                        <option value="remote_action">Remote Actions (Red Line + Red Pulse on Sec. Node)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Event Type</label>
+                    <select id="edit-event-type" onchange="toggleEventFields()">
+                        <option value="none">-- None / Generic --</option>
+                        <option value="Process">Process</option>
+                        <option value="Process_Injection">Process Injection</option>
+                        <option value="Network">Network</option>
+                        <option value="File">File</option>
+                        <option value="Authentication">Authentication</option>
+                        <option value="Account">Account</option>
+                        <option value="Service">Service</option>
+                        <option value="Registry">Registry</option>
+                    </select>
+                </div>
+                
+                <div id="fields-Process" class="dynamic-fields">
+                    <div class="form-row">
+                        <div class="form-group"><label>Process Name</label><input type="text" id="ev-proc-name"></div>
+                        <div class="form-group"><label>PID</label><input type="text" id="ev-proc-pid"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Parent Process Name</label><input type="text" id="ev-proc-pname"></div>
+                        <div class="form-group"><label>PPID</label><input type="text" id="ev-proc-ppid"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Process Path</label>
+                        <input type="text" id="ev-proc-path">
+                    </div>
+                </div>
+                
+                <div id="fields-Process_Injection" class="dynamic-fields">
+                    <div class="form-row"><div class="form-group"><label>Source Process</label><input type="text" id="ev-pinj-srcproc"></div><div class="form-group"><label>Source PID</label><input type="text" id="ev-pinj-srcpid"></div></div>
+                    <div class="form-row"><div class="form-group"><label>Dest Process</label><input type="text" id="ev-pinj-dstproc"></div><div class="form-group"><label>Dest PID</label><input type="text" id="ev-pinj-dstpid"></div></div>
+                </div>
+                
+                <div id="fields-Network" class="dynamic-fields">
+                    <div class="form-row"><div class="form-group"><label>Source IP</label><input type="text" id="ev-net-src"></div><div class="form-group"><label>Dest IP</label><input type="text" id="ev-net-dst"></div></div>
+                    <div class="form-row"><div class="form-group"><label>Port</label><input type="text" id="ev-net-port"></div><div class="form-group"><label>Protocol</label><input type="text" id="ev-net-proto"></div></div>
+                    <div class="form-row"><div class="form-group"><label>Process Name</label><input type="text" id="ev-net-procname"></div><div class="form-group"><label>Process ID</label><input type="text" id="ev-net-procid"></div></div>
+                </div>
+                
+                <div id="fields-File" class="dynamic-fields">
+                    <div class="form-row"><div class="form-group"><label>File Name</label><input type="text" id="ev-file-name"></div><div class="form-group"><label>Action</label><select id="ev-file-action"><option value="Created">Created</option><option value="Updated">Updated</option><option value="Deleted">Deleted</option></select></div></div>
+                    <div class="form-group"><label>File Path</label><input type="text" id="ev-file-path"></div>
+                    <div class="form-row"><div class="form-group"><label>Process Name</label><input type="text" id="ev-file-procname"></div><div class="form-group"><label>Process ID</label><input type="text" id="ev-file-procid"></div></div>
+                </div>
+                
+                <div id="fields-Authentication" class="dynamic-fields">
+                    <div class="form-row"><div class="form-group"><label>User Name</label><input type="text" id="ev-auth-user"></div><div class="form-group"><label>Result</label><select id="ev-auth-result"><option value="Success">Success</option><option value="Failure">Failure</option></select></div></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Attempts</label><input type="number" id="ev-auth-attempts" value="1"></div>
+                        <div class="form-group"><label>Logon Type</label><input type="text" id="ev-auth-logontype" placeholder="e.g. 3"></div>
+                    </div>
+                </div>
+                
+                <div id="fields-Service" class="dynamic-fields">
+                    <div class="form-row"><div class="form-group"><label>Service Name</label><input type="text" id="ev-svc-name"></div><div class="form-group"><label>Account Name</label><input type="text" id="ev-svc-account"></div></div>
+                    <div class="form-row"><div class="form-group"><label>Process Name</label><input type="text" id="ev-svc-procname"></div><div class="form-group"><label>Process ID</label><input type="text" id="ev-svc-procid"></div></div>
+                </div>
+                
+                <div id="fields-Account" class="dynamic-fields">
+                    <div class="form-row"><div class="form-group"><label>Account Name</label><input type="text" id="ev-acc-name"></div><div class="form-group"><label>Action</label><select id="ev-acc-action"><option value="Created">Created</option><option value="Modified">Modified</option><option value="Deleted">Deleted</option><option value="Added to Group">Added to Group</option></select></div></div>
+                    <div class="form-row"><div class="form-group"><label>Process Name</label><input type="text" id="ev-acc-procname"></div><div class="form-group"><label>Process ID</label><input type="text" id="ev-acc-procid"></div></div>
+                </div>
+                
+                <div id="fields-Registry" class="dynamic-fields">
+                    <div class="form-group"><label>Key Path</label><input type="text" id="ev-reg-path"></div>
+                    <div class="form-row"><div class="form-group"><label>Value Name</label><input type="text" id="ev-reg-valname"></div><div class="form-group"><label>Value Data</label><input type="text" id="ev-reg-valdata"></div></div>
+                    <div class="form-row"><div class="form-group"><label>Process Name</label><input type="text" id="ev-reg-procname"></div><div class="form-group"><label>Process ID</label><input type="text" id="ev-reg-procid"></div></div>
+                </div>
+                <div class="form-group"><label>Description / Narrative</label><textarea id="edit-desc" rows="2"></textarea></div>
+                <div class="form-group"><label>Raw Log / Indicator (Optional)</label><input type="text" id="edit-raw"></div>
+                <div class="editor-actions">
+                    <button id="btn-add-step" class="btn-success btn-flex">Add Step</button>
+                    <button id="btn-update-step" class="btn-flex">Update Step</button>
+                    <button id="btn-delete-step" class="btn-danger btn-flex">Delete Step</button>
+                    <button id="btn-clear-step" class="btn-flex">Clear Form</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let appData = { nodes: [], steps: [], reports: [] };
+        let currentStep = 0; 
+        let currentView = 'map';
+        let currentReportId = null;
+        let selectedNodeId = null;
+        const mapContainer = document.getElementById("map-container");
+        const detailsPanel = document.getElementById("details-panel");
+        const controlsPanel = document.getElementById("controls");
+        const ledgerContainer = document.getElementById("ledger-container");
+        const reportsContainer = document.getElementById("reports-container");
+        const mainTitle = document.getElementById("main-title");
+        const mapWorkspace = document.getElementById("map-workspace");
+        const svgLayer = document.getElementById("svg-layer");
+        const emptyState = document.getElementById("empty-state");
+        const svgNS = "http://www.w3.org/2000/svg";
+        
+        const resizeObserver = new ResizeObserver(() => { if(currentView === 'map') drawSVG(); });
+        resizeObserver.observe(document.getElementById("map-container"));
+        
+        function switchMainView(viewType) {
+            currentView = viewType;
+            mapContainer.style.display = "none";
+            detailsPanel.style.display = "none";
+            controlsPanel.style.display = "none";
+            ledgerContainer.style.display = "none";
+            reportsContainer.style.display = "none";
+            if (viewType === 'map') {
+                mapContainer.style.display = "block";
+                detailsPanel.style.display = "flex";
+                controlsPanel.style.display = "flex";
+                mainTitle.textContent = "VIPER v0.2";
+                mainTitle.style.color = "var(--accent)";
+                setTimeout(() => drawSVG(), 50);
+            } else if (viewType === 'ledger') {
+                ledgerContainer.style.display = "block";
+                mainTitle.textContent = "Attack Ledger";
+                mainTitle.style.color = "var(--warning)";
+                renderLedger();
+            } else if (viewType === 'reports') {
+                reportsContainer.style.display = "flex";
+                mainTitle.textContent = "Reports";
+                mainTitle.style.color = "#ce93d8";
+                renderReportList();
+            }
+        }
+        
+        // --- REPORTS LOGIC ---
+        function createNewReport() {
+            const newId = "report_" + Date.now();
+            appData.reports.push({
+                id: newId,
+                title: "New Report " + (appData.reports.length + 1),
+                tags: [],
+                content: "",
+                isLocked: false // Persist lock state
+            });
+            document.getElementById("report-search").value = "";
+            renderReportList();
+            openReport(newId);
+        }
+        
+        function filterReports() {
+            const q = document.getElementById("report-search").value.toLowerCase();
+            const list = document.getElementById("report-list");
+            list.innerHTML = "";
+            
+            appData.reports.forEach(r => {
+                const contentText = (r.content || "").replace(/<[^>]+>/g, '').toLowerCase();
+                const tagText = (r.tags || []).join(" ").toLowerCase();
+                const titleText = (r.title || "").toLowerCase();
+                
+                if (titleText.includes(q) || contentText.includes(q) || tagText.includes(q)) {
+                    let div = document.createElement("div");
+                    div.className = "report-item" + (currentReportId === r.id ? " active" : "");
+                    div.textContent = r.title || "Untitled Report";
+                    div.onclick = () => openReport(r.id);
+                    list.appendChild(div);
+                }
+            });
+        }
+        
+        function renderReportList() {
+            document.getElementById("report-empty").style.display = appData.reports.length === 0 ? "block" : "none";
+            filterReports(); 
+        }
+        
+        function openReport(id) {
+            currentReportId = id;
+            document.getElementById("report-detail-panel").style.display = "flex";
+            const reportData = appData.reports.find(r => r.id === id);
+            document.getElementById("report-title").value = reportData.title;
+            
+            document.getElementById("report-editor").innerHTML = reportData.content || "";
+            document.getElementById("report-lock").checked = !!reportData.isLocked;
+            toggleReportLock(false); 
+            
+            renderReportList(); 
+            renderReportTags();
+        }
+        
+        function deleteReport() {
+            if(!currentReportId) return;
+            if(confirm("Are you sure you want to delete this report? This cannot be undone.")) {
+                appData.reports = appData.reports.filter(r => r.id !== currentReportId);
+                currentReportId = null;
+                document.getElementById("report-detail-panel").style.display = "none";
+                renderReportList();
+            }
+        }
+        
+        function saveReportMeta() {
+            if(!currentReportId) return;
+            const reportData = appData.reports.find(r => r.id === currentReportId);
+            reportData.title = document.getElementById("report-title").value;
+            renderReportList();
+        }
+        
+        function saveReportContent() {
+            if(!currentReportId) return;
+            const reportData = appData.reports.find(r => r.id === currentReportId);
+            reportData.content = document.getElementById("report-editor").innerHTML;
+        }
+        
+        function toggleReportLock(userInitiated = true) {
+            const isLocked = document.getElementById("report-lock").checked;
+            const editMode = document.getElementById("report-edit-mode");
+            const viewMode = document.getElementById("report-view-mode");
+            
+            if(currentReportId && userInitiated) {
+                const reportData = appData.reports.find(r => r.id === currentReportId);
+                if(reportData) {
+                    reportData.isLocked = isLocked;
+                    if(isLocked) saveReportContent();
+                }
+            }
+            
+            if(isLocked) {
+                const reportData = appData.reports.find(r => r.id === currentReportId);
+                viewMode.innerHTML = (reportData && reportData.content) ? reportData.content : "<p style='color:#666;'>No content added yet.</p>";
+                editMode.style.display = "none";
+                viewMode.style.display = "block";
+            } else {
+                viewMode.style.display = "none";
+                editMode.style.display = "flex";
+            }
+        }
+        
+        function insertTable() {
+            const tableHTML = '<table border="1"><tbody><tr><th>Header 1</th><th>Header 2</th></tr><tr><td>Data</td><td>Data</td></tr></tbody></table><br>';
+            document.execCommand('insertHTML', false, tableHTML);
+            saveReportContent();
+        }
+        
+        document.getElementById('report-tag-input').addEventListener('keypress', function(e) {
+            if(e.key === 'Enter') { e.preventDefault(); addReportTag(); }
+        });
+        
+        function addReportTag() {
+            if(!currentReportId) return;
+            const input = document.getElementById('report-tag-input');
+            const val = input.value.trim();
+            if(!val) return;
+            const reportData = appData.reports.find(r => r.id === currentReportId);
+            if(!reportData.tags.includes(val)) {
+                reportData.tags.push(val);
+                renderReportTags();
+            }
+            input.value = '';
+        }
+        
+        function removeReportTag(tagStr) {
+            const reportData = appData.reports.find(r => r.id === currentReportId);
+            reportData.tags = reportData.tags.filter(t => t !== tagStr);
+            renderReportTags();
+        }
+        
+        function renderReportTags() {
+            const container = document.getElementById('report-tag-container');
+            container.innerHTML = "";
+            const reportData = appData.reports.find(r => r.id === currentReportId);
+            if (!reportData || !reportData.tags) return;
+            reportData.tags.forEach(tag => {
+                const el = document.createElement('div');
+                el.className = 'tag-badge';
+                el.innerHTML = `${tag} <span class="tag-remove" onclick="removeReportTag('${tag}')">×</span>`;
+                container.appendChild(el);
+            });
+        }
+        
+        function htmlToMarkdown(html) {
+            let md = html || "";
+            md = md.replace(/<table[^>]*>([\s\S]*?)<\/table>/gi, function(match, tableContent) {
+                let res = '\n';
+                let rows = tableContent.match(/<tr[^>]*>([\s\S]*?)<\/tr>/gi) || [];
+                rows.forEach((row, i) => {
+                    let cells = row.match(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi) || [];
+                    let rowText = '| ' + cells.map(c => c.replace(/<\/?t[dh][^>]*>/gi, '').trim()).join(' | ') + ' |';
+                    res += rowText + '\n';
+                    if (i === 0) { res += '|' + cells.map(() => '---').join('|') + '|\n'; } 
+                });
+                return res + '\n';
+            });
+            md = md.replace(/<h1>(.*?)<\/h1>/gi, '# $1\n\n');
+            md = md.replace(/<h2>(.*?)<\/h2>/gi, '## $1\n\n');
+            md = md.replace(/<h3>(.*?)<\/h3>/gi, '### $1\n\n');
+            md = md.replace(/<b>(.*?)<\/b>/gi, '**$1**');
+            md = md.replace(/<strong>(.*?)<\/strong>/gi, '**$1**');
+            md = md.replace(/<i>(.*?)<\/i>/gi, '*$1*');
+            md = md.replace(/<em>(.*?)<\/em>/gi, '*$1*');
+            md = md.replace(/<u>(.*?)<\/u>/gi, '__$1__');
+            md = md.replace(/<ul>/gi, '\n');
+            md = md.replace(/<\/ul>/gi, '\n\n');
+            md = md.replace(/<li>(.*?)<\/li>/gi, '- $1\n');
+            md = md.replace(/<div>(.*?)<\/div>/gi, '$1\n');
+            md = md.replace(/<p>(.*?)<\/p>/gi, '$1\n\n');
+            md = md.replace(/<br\s*[\/]?>/gi, '\n');
+            md = md.replace(/<[^>]+>/g, ''); 
+            md = md.replace(/&nbsp;/g, ' ');
+            return md.trim();
+        }
+        
+        function downloadMarkdown() {
+            if(!currentReportId) return;
+            saveReportContent();
+            const reportData = appData.reports.find(r => r.id === currentReportId);
+            const mdContent = htmlToMarkdown(reportData.content);
+            const blob = new Blob([mdContent], { type: "text/markdown;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${reportData.title.replace(/\s+/g, '_')}.md`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // --- NODE UI TAGGING LOGIC (Other IPs & CVEs) ---
+        function addNodeOtherIp() {
+            const input = document.getElementById('node-other-ip-input');
+            const val = input.value.trim();
+            if(!val) return;
+            const container = document.getElementById('node-other-ips-container');
+            for(let child of container.children) { if(child.dataset.val === val) return; }
+            const el = document.createElement('div'); el.className = 'tag-badge'; el.dataset.val = val;
+            el.innerHTML = `${val} <span class="tag-remove" onclick="this.parentElement.remove()">×</span>`;
+            container.appendChild(el);
+            input.value = '';
+        }
+        document.getElementById('node-other-ip-input').addEventListener('keypress', function(e) {
+            if(e.key === 'Enter') { e.preventDefault(); addNodeOtherIp(); }
+        });
+        
+        document.getElementById('btn-add-cve').onclick = () => {
+            const input = document.getElementById('node-cve-input');
+            const val = input.value.trim().toUpperCase();
+            if(!val) return;
+            const container = document.getElementById('node-cve-container');
+            for(let child of container.children) { if(child.dataset.val === val) return; }
+            const el = document.createElement('div'); el.className = 'tag-badge'; el.dataset.val = val;
+            el.innerHTML = `${val} <span class="tag-remove" onclick="this.parentElement.remove()">×</span>`;
+            container.appendChild(el);
+            input.value = '';
+        };
+        document.getElementById('node-cve-input').addEventListener('keypress', function(e) {
+            if(e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-add-cve').click(); }
+        });
+        
+        function selectNode(id) {
+            selectedNodeId = id; 
+            const node = appData.nodes.find(n => n.id === id);
+            if(node) { 
+                document.getElementById("node-host").value = node.host || ""; 
+                document.getElementById("node-ip").value = node.ip || ""; 
+                document.getElementById("node-os").value = node.os || ""; 
+                document.getElementById("node-notes").value = node.notes || ""; 
+                document.getElementById("node-icon").value = node.icon; 
+                document.getElementById("node-x").value = node.x || 50; 
+                document.getElementById("node-y").value = node.y || 50; 
+                
+                const otherIpsContainer = document.getElementById("node-other-ips-container");
+                otherIpsContainer.innerHTML = "";
+                if(node.other_ips) {
+                    node.other_ips.forEach(ip => {
+                        const el = document.createElement('div'); el.className = 'tag-badge'; el.dataset.val = ip;
+                        el.innerHTML = `${ip} <span class="tag-remove" onclick="this.parentElement.remove()">×</span>`;
+                        otherIpsContainer.appendChild(el);
+                    });
+                }
+                
+                const cveContainer = document.getElementById("node-cve-container");
+                cveContainer.innerHTML = "";
+                if(node.cves) {
+                    node.cves.forEach(cve => {
+                        const el = document.createElement('div'); el.className = 'tag-badge'; el.dataset.val = cve;
+                        el.innerHTML = `${cve} <span class="tag-remove" onclick="this.parentElement.remove()">×</span>`;
+                        cveContainer.appendChild(el);
+                    });
+                }
+                
+                const reportsListDiv = document.getElementById("node-reports-list");
+                const relatedContainer = document.getElementById("node-related-reports");
+                reportsListDiv.innerHTML = "";
+                let matchedReports = 0;
+                
+                if (appData.reports) {
+                    appData.reports.forEach(r => {
+                        let isMatched = false;
+                        if (node.host && r.tags.includes(node.host)) isMatched = true;
+                        if (node.ip && r.tags.includes(node.ip)) isMatched = true;
+                        if (node.other_ips && node.other_ips.some(oip => r.tags.includes(oip))) isMatched = true;
+                        
+                        if (isMatched) {
+                            matchedReports++;
+                            let link = document.createElement("div");
+                            link.className = "related-report-link";
+                            link.textContent = "📄 " + r.title;
+                            link.onclick = () => {
+                                switchMainView('reports');
+                                openReport(r.id);
+                            };
+                            reportsListDiv.appendChild(link);
+                        }
+                    });
+                }
+                
+                if (matchedReports > 0) {
+                    relatedContainer.style.display = "block";
+                } else {
+                    relatedContainer.style.display = "none";
+                }
+                
+                if(currentView === 'map') {
+                    const editor = document.getElementById("editor-column");
+                    if(editor.classList.contains("collapsed")) {
+                        editor.classList.remove("collapsed");
+                    }
+                    switchTab('nodes');
+                }
+            }
+        }
+        
+        document.getElementById("btn-clear-node").onclick = () => {
+            selectedNodeId = null;
+            document.getElementById("node-host").value = "";
+            document.getElementById("node-ip").value = "";
+            document.getElementById("node-os").value = "";
+            document.getElementById("node-notes").value = "";
+            document.getElementById("node-x").value = 50; 
+            document.getElementById("node-y").value = 50; 
+            document.getElementById("node-other-ips-container").innerHTML = "";
+            document.getElementById("node-other-ip-input").value = "";
+            document.getElementById("node-cve-container").innerHTML = "";
+            document.getElementById("node-cve-input").value = "";
+        };
+        
+        let zoomScale = 0.85; let panX = 0; let panY = 0; let isPanning = false; let panStartX = 0; let panStartY = 0;
+        function clampPan() {
+            let maxPanX = mapContainer.clientWidth; let maxPanY = mapContainer.clientHeight;
+            if (panX > maxPanX) panX = maxPanX; if (panX < -maxPanX) panX = -maxPanX;
+            if (panY > maxPanY) panY = maxPanY; if (panY < -maxPanY) panY = -maxPanY;
+        }
+        function updateMapTransform() { clampPan(); mapWorkspace.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomScale})`; drawSVG(); }
+        function setZoom(delta) { zoomScale += delta; if(zoomScale < 0.3) zoomScale = 0.3; if(zoomScale > 3.0) zoomScale = 3.0; updateMapTransform(); }
+        function resetZoomPan() { zoomScale = 0.85; panX = 0; panY = 0; mapWorkspace.classList.add('anim-transform'); updateMapTransform(); }
+        mapContainer.addEventListener('wheel', (e) => { e.preventDefault(); mapWorkspace.classList.remove('anim-transform'); setZoom(e.deltaY * -0.001); });
+        mapContainer.addEventListener('mousedown', (e) => { if(e.target.closest('.node') || e.target.closest('button')) return; isPanning = true; mapWorkspace.classList.remove('anim-transform'); panStartX = e.clientX - panX; panStartY = e.clientY - panY; mapContainer.style.cursor = 'grabbing'; });
+        window.addEventListener('mousemove', (e) => { if(isPanning) { panX = e.clientX - panStartX; panY = e.clientY - panStartY; updateMapTransform(); } });
+        window.addEventListener('mouseup', () => { if(isPanning) { isPanning = false; mapContainer.style.cursor = 'grab'; } });
+        document.getElementById("btn-toggle-editor").onclick = () => { const editor = document.getElementById("editor-column"); editor.classList.toggle("collapsed"); };
+        
+        function switchTab(tabId) { 
+            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active")); 
+            document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active")); 
+            // Target specific tab button reliably
+            document.querySelector(`.tab-btn[onclick="switchTab('${tabId}')"]`).classList.add("active"); 
+            document.getElementById("tab-" + tabId).classList.add("active"); 
+        }
+        
+        function toggleEventFields() {
+            document.querySelectorAll(".dynamic-fields").forEach(el => el.style.display = "none");
+            let type = document.getElementById("edit-event-type").value;
+            if(type !== "none") { let target = document.getElementById("fields-" + type); if(target) target.style.display = "block"; }
+        }
+        
+        let isDraggingNode = false; let dragNodeId = null; let lastMouseX = 0, lastMouseY = 0;
+        function renderNodes() {
+            document.querySelectorAll(".node").forEach(n => n.remove()); emptyState.style.display = (appData.nodes.length === 0 && appData.steps.length === 0) ? "block" : "none";
+            appData.nodes.forEach(node => {
+                let div = document.createElement("div"); div.id = node.id; div.className = "node"; div.style.left = node.x + "%"; div.style.top = node.y + "%";
+                div.onmousedown = (e) => startDrag(e, node.id); div.onclick = () => selectNode(node.id);
+                let svgHTML = "<svg viewBox='0 0 24 24'><use href='#" + node.icon + "'></use></svg>"; let textHTML = "";
+                if(node.host) textHTML += "<span class='node-host'>" + node.host + "</span>"; if(node.ip) textHTML += "<span class='node-ip'>" + node.ip + "</span>";
+                div.innerHTML = svgHTML + textHTML; mapWorkspace.appendChild(div);
+            });
+            updateNodeDropdowns(); renderNodeList(); 
+            if(currentView === 'map') drawSVG();
+        }
+        function startDrag(e, id) { isDraggingNode = true; dragNodeId = id; selectNode(id); lastMouseX = e.clientX; lastMouseY = e.clientY; document.addEventListener('mousemove', onDragNode); document.addEventListener('mouseup', stopDragNode); }
+        function onDragNode(e) {
+            if(!isDraggingNode) return; let deltaX = (e.clientX - lastMouseX) / zoomScale; let deltaY = (e.clientY - lastMouseY) / zoomScale; lastMouseX = e.clientX; lastMouseY = e.clientY;
+            let node = appData.nodes.find(n => n.id === dragNodeId);
+            if(node) {
+                let curX = (parseFloat(node.x) / 100) * mapWorkspace.clientWidth; let curY = (parseFloat(node.y) / 100) * mapWorkspace.clientHeight;
+                let newXPct = ((curX + deltaX) / mapWorkspace.clientWidth) * 100; let newYPct = ((curY + deltaY) / mapWorkspace.clientHeight) * 100;
+                node.x = Math.max(0, Math.min(100, newXPct)).toFixed(2); node.y = Math.max(0, Math.min(100, newYPct)).toFixed(2);
+                document.getElementById(node.id).style.left = node.x + "%"; document.getElementById(node.id).style.top = node.y + "%";
+                if(selectedNodeId === dragNodeId) {
+                    document.getElementById("node-x").value = node.x;
+                    document.getElementById("node-y").value = node.y;
+                }
+                if(currentView === 'map') drawSVG();
+            }
+        }
+        function stopDragNode() { isDraggingNode = false; dragNodeId = null; document.removeEventListener('mousemove', onDragNode); document.removeEventListener('mouseup', stopDragNode); renderNodeList(); }
+        function updateNodeDropdowns() {
+            const n1 = document.getElementById("edit-node1"); const n2 = document.getElementById("edit-node2");
+            n1.innerHTML = ""; n2.innerHTML = "<option value='none'>-- None (Local) --</option>";
+            appData.nodes.forEach(node => { let label = node.host || node.ip; let opt1 = document.createElement("option"); opt1.value = node.id; opt1.text = label; n1.appendChild(opt1); let opt2 = document.createElement("option"); opt2.value = node.id; opt2.text = label; n2.appendChild(opt2); });
+        }
+        function renderNodeList() {
+            const list = document.getElementById("node-list"); list.innerHTML = "";
+            appData.nodes.forEach(node => { 
+                let item = document.createElement("div"); item.className = "node-item"; 
+                item.innerHTML = "<span>" + (node.host || node.ip) + "</span>"; 
+                item.onclick = () => selectNode(node.id); list.appendChild(item); 
+            });
+        }
+        document.getElementById("btn-save-node").onclick = () => {
+            const host = document.getElementById("node-host").value.trim(); const ip = document.getElementById("node-ip").value.trim();
+            if(!host && !ip) return alert("Node must have at least a Hostname or IP.");
+            
+            let otherIps = Array.from(document.getElementById("node-other-ips-container").children).map(el => el.dataset.val);
+            let cves = Array.from(document.getElementById("node-cve-container").children).map(el => el.dataset.val);
+            
+            let payload = { 
+                host: host, ip: ip, os: document.getElementById("node-os").value, 
+                icon: document.getElementById("node-icon").value, x: document.getElementById("node-x").value || 50, y: document.getElementById("node-y").value || 50,
+                notes: document.getElementById("node-notes").value,
+                other_ips: otherIps,
+                cves: cves
+            };
+            if(selectedNodeId) { Object.assign(appData.nodes.find(n => n.id === selectedNodeId), payload); } 
+            else { payload.id = "node_" + Date.now(); appData.nodes.push(payload); } 
+            renderNodes();
+        };
+        // --- ATTACK STEPS ENGINE ---
+        function sortScenario() { 
+            appData.steps.sort((a, b) => new Date(a.date+"T"+a.time) - new Date(b.date+"T"+b.time)); 
+            renderLedger(); 
+        }
+        function getCenterPoint(elementId) {
+            const el = document.getElementById(elementId); if(!el) return null;
+            return { x: (parseFloat(el.style.left) / 100) * mapWorkspace.clientWidth, y: (parseFloat(el.style.top) / 100) * mapWorkspace.clientHeight };
+        }
+        function highlightActiveNodes() {
+            document.querySelectorAll(".node").forEach(nodeEl => { nodeEl.classList.remove("active-primary", "active-secondary"); });
+            if (appData.steps.length === 0) return; const stepData = appData.steps[currentStep]; if (!stepData || !stepData.nodes || stepData.nodes.length === 0) return;
+            const pNode = document.getElementById(stepData.nodes[0]);
+            if(pNode) pNode.classList.add("active-primary");
+            if (stepData.nodes.length === 2 && stepData.nodes[1] !== "none" && stepData.nodes[1] !== stepData.nodes[0]) {
+                const sNode = document.getElementById(stepData.nodes[1]);
+                if(sNode) sNode.classList.add("active-secondary");
+            }
+        }
+        function drawSVG() {
+            while (svgLayer.firstChild) { svgLayer.removeChild(svgLayer.firstChild); }
+            if (appData.steps.length === 0) return; const stepData = appData.steps[currentStep]; if (!stepData || !stepData.nodes || stepData.nodes.length === 0) return;
+            const t = stepData.type;
+            const isLineAction = (t === "internal" || t === "external" || t === "staging" || t === "exfil" || t === "remote_action");
+            const isPulseAction = (t === "local" || t === "discovery" || t === "file_event" || t === "staging" || t === "exfil" || t === "remote_action");
+            let drawLine = isLineAction && stepData.nodes.length === 2; let drawPulse = isPulseAction; let actualType = t;
+            if (isLineAction && stepData.nodes.length < 2) { drawLine = false; drawPulse = true; actualType = "local"; }
+            
+            if (drawLine) {
+                const p1 = getCenterPoint(stepData.nodes[0]); const p2 = getCenterPoint(stepData.nodes[1]);
+                if(p1 && p2) {
+                    const line = document.createElementNS(svgNS, "line");
+                    line.setAttribute("x1", p1.x); line.setAttribute("y1", p1.y); line.setAttribute("x2", p2.x); line.setAttribute("y2", p2.y);
+                    const lineClass = (t === "external" || t === "exfil" || t === "remote_action") ? "path-external" : "path-internal";
+                    line.setAttribute("class", "path-line " + lineClass); svgLayer.appendChild(line);
+                }
+            }
+            if (drawPulse) {
+                let targetNode = stepData.nodes[0];
+                if ((t === "staging" || t === "exfil" || t === "remote_action") && stepData.nodes.length === 2) { targetNode = stepData.nodes[1]; }
+                const center = getCenterPoint(targetNode);
+                if(center) {
+                    const circle = document.createElementNS(svgNS, "circle");
+                    circle.setAttribute("cx", center.x); circle.setAttribute("cy", center.y); circle.setAttribute("r", "25"); 
+                    let pulseClass = "pulse-red";
+                    if (actualType === "discovery") { pulseClass = "pulse-green"; } 
+                    else if (actualType === "file_event" || actualType === "staging" || actualType === "exfil") { pulseClass = "pulse-orange"; } 
+                    circle.setAttribute("class", "pulse-circle " + pulseClass); svgLayer.appendChild(circle);
+                }
+            }
+        }
+        function formatEventDataHTML(eventType, evData) {
+            if(!evData || eventType === "none") return "";
+            let html = `<strong>[${eventType.replace('_',' ')} Event]</strong><br>`;
+            for (const [key, value] of Object.entries(evData)) {
+                if(value) html += `<span style="color:var(--accent)">${key}:</span> ${value} &nbsp;&nbsp; `;
+            }
+            return html;
+        }
+        
+        function getNodeLabel(nodeId) {
+            if(!nodeId || nodeId === "none") return null;
+            const node = appData.nodes.find(n => n.id === nodeId);
+            if(!node) return "Unknown Node";
+            let label = node.host || "Unnamed Node";
+            if (node.host && node.ip) label = `${node.host} (${node.ip})`;
+            else if (!node.host && node.ip) label = node.ip;
+            return label;
+        }
+        
+        function renderLedger() {
+            const list = document.getElementById("ledger-list");
+            const emptyTxt = document.getElementById("ledger-empty");
+            list.innerHTML = "";
+            if (appData.steps.length === 0) { emptyTxt.style.display = "block"; return; }
+            emptyTxt.style.display = "none";
+            appData.steps.forEach((step, idx) => {
+                let item = document.createElement("div"); item.className = "ledger-item";
+                item.onclick = () => { currentStep = idx; updateUI(); switchMainView('map'); };
+                let tacticHtml = step.tactic ? `<span class="tactic-badge" style="margin: 0;">${step.tactic}</span>` : "";
+                let evHtml = formatEventDataHTML(step.eventType, step.eventData);
+                let evBlock = evHtml ? `<div class="ledger-event" style="margin-top: 5px;">${evHtml}</div>` : "";
+                
+                let primaryNodeLabel = "";
+                let secondaryNodeLabel = "";
+                if (step.nodes && step.nodes.length > 0) {
+                     primaryNodeLabel = getNodeLabel(step.nodes[0]);
+                     if (step.nodes.length > 1 && step.nodes[1] !== "none") {
+                         secondaryNodeLabel = getNodeLabel(step.nodes[1]);
+                     }
+                }
+                
+                let nodesHtml = "";
+                if (primaryNodeLabel) {
+                    nodesHtml = `<div style="font-size: 0.85rem; color: #a5d6a7; margin-bottom: 4px;">`;
+                    if (secondaryNodeLabel) {
+                         nodesHtml += `<strong>Primary:</strong> ${primaryNodeLabel} &nbsp;➡️&nbsp; <strong>Secondary:</strong> ${secondaryNodeLabel}`;
+                    } else {
+                         nodesHtml += `<strong>Node:</strong> ${primaryNodeLabel}`;
+                    }
+                    nodesHtml += `</div>`;
+                }
+
+                item.innerHTML = `
+                    <div class="ledger-header">
+                        <span style="font-size: 1.1rem; font-weight: bold; color: var(--accent);">Step ${idx + 1} <span style="color: #fff; margin-left: 8px;">${step.title || "Untitled"}</span></span>
+                        ${tacticHtml}
+                    </div>
+                    <div class="ledger-body">
+                        <strong>${step.action || "No Action"} | [${step.date} - ${step.time}]</strong>
+                        ${nodesHtml}
+                        ${evBlock}
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+        function updateUI() {
+            if (appData.steps.length === 0) {
+                document.getElementById("step-counter").textContent = "Step 0 of 0"; document.getElementById("step-title").textContent = "--";
+                document.getElementById("step-desc").textContent = "No data available."; document.getElementById("meta-time").textContent = "Time: --";
+                document.getElementById("meta-action").textContent = "Action: --"; document.getElementById("meta-raw").textContent = "Raw: --";
+                document.getElementById("step-tactic").style.display = "none"; document.getElementById("event-data-container").style.display = "none";
+                document.getElementById("btn-prev").disabled = true; document.getElementById("btn-next").disabled = true; 
+                highlightActiveNodes(); if(currentView === 'map') drawSVG(); return;
+            }
+            if (currentStep >= appData.steps.length) currentStep = appData.steps.length - 1; if (currentStep < 0) currentStep = 0;
+            const data = appData.steps[currentStep];
+            document.getElementById("step-counter").textContent = "Step " + (currentStep + 1) + " of " + appData.steps.length;
+            document.getElementById("step-title").textContent = data.title || "Untitled"; document.getElementById("step-desc").textContent = data.desc || "";
+            document.getElementById("meta-time").textContent = "Time: " + data.date + " " + data.time; document.getElementById("meta-action").textContent = "Action: " + data.action;
+            document.getElementById("meta-raw").textContent = "Raw: " + data.raw;
+            
+            const tacBadge = document.getElementById("step-tactic");
+            if(data.tactic) { tacBadge.textContent = data.tactic; tacBadge.style.display = "inline-block"; } else { tacBadge.style.display = "none"; }
+            
+            const evBox = document.getElementById("event-data-container");
+            const evHtml = formatEventDataHTML(data.eventType, data.eventData);
+            if(evHtml) { evBox.innerHTML = evHtml; evBox.style.display = "block"; } else { evBox.style.display = "none"; }
+            
+            document.getElementById("btn-prev").disabled = (currentStep === 0); document.getElementById("btn-next").disabled = (currentStep === appData.steps.length - 1);
+            
+            populateStepEditor(data); highlightActiveNodes(); if(currentView === 'map') drawSVG();
+        }
+        function populateStepEditor(data) {
+            document.getElementById("edit-title").value = data.title || ""; document.getElementById("edit-date").value = data.date || "";
+            document.getElementById("edit-time").value = data.time || ""; document.getElementById("edit-action").value = data.action || "";
+            document.getElementById("edit-desc").value = data.desc || ""; document.getElementById("edit-raw").value = data.raw || "";
+            document.getElementById("edit-tactic").value = data.tactic || ""; document.getElementById("edit-type").value = data.type || "local";
+            
+            if(data.nodes.length > 0) document.getElementById("edit-node1").value = data.nodes[0];
+            if(data.nodes.length > 1) document.getElementById("edit-node2").value = data.nodes[1]; else document.getElementById("edit-node2").value = "none";
+            
+            document.getElementById("edit-event-type").value = data.eventType || "none"; toggleEventFields();
+            
+            if(data.eventType && data.eventData) {
+                const ed = data.eventData;
+                if(data.eventType === "Process") { document.getElementById("ev-proc-name").value = ed.Name || ""; document.getElementById("ev-proc-pid").value = ed.PID || ""; document.getElementById("ev-proc-path").value = ed.Path || ""; document.getElementById("ev-proc-ppid").value = ed.PPID || ""; document.getElementById("ev-proc-pname").value = ed.PPName || ""; }
+                else if(data.eventType === "Process_Injection") { document.getElementById("ev-pinj-srcproc").value = ed.SrcProc || ""; document.getElementById("ev-pinj-srcpid").value = ed.SrcPID || ""; document.getElementById("ev-pinj-dstproc").value = ed.DstProc || ""; document.getElementById("ev-pinj-dstpid").value = ed.DstPID || ""; }
+                else if(data.eventType === "Network") { document.getElementById("ev-net-src").value = ed.SrcIP || ""; document.getElementById("ev-net-dst").value = ed.DstIP || ""; document.getElementById("ev-net-port").value = ed.Port || ""; document.getElementById("ev-net-proto").value = ed.Protocol || ""; document.getElementById("ev-net-procname").value = ed.ProcName || ""; document.getElementById("ev-net-procid").value = ed.ProcID || ""; }
+                else if(data.eventType === "File") { document.getElementById("ev-file-name").value = ed.Name || ""; document.getElementById("ev-file-action").value = ed.Action || "Created"; document.getElementById("ev-file-path").value = ed.Path || ""; document.getElementById("ev-file-procname").value = ed.ProcName || ""; document.getElementById("ev-file-procid").value = ed.ProcID || ""; }
+                else if(data.eventType === "Authentication") { document.getElementById("ev-auth-user").value = ed.User || ""; document.getElementById("ev-auth-result").value = ed.Result || "Success"; document.getElementById("ev-auth-attempts").value = ed.Attempts || "1"; document.getElementById("ev-auth-logontype").value = ed.LogonType || ""; }
+                else if(data.eventType === "Service") { document.getElementById("ev-svc-name").value = ed.Service || ""; document.getElementById("ev-svc-account").value = ed.Account || ""; document.getElementById("ev-svc-procname").value = ed.ProcName || ""; document.getElementById("ev-svc-procid").value = ed.ProcID || ""; }
+                else if(data.eventType === "Account") { document.getElementById("ev-acc-name").value = ed.Account || ""; document.getElementById("ev-acc-action").value = ed.Action || "Created"; document.getElementById("ev-acc-procname").value = ed.ProcName || ""; document.getElementById("ev-acc-procid").value = ed.ProcID || ""; }
+                else if(data.eventType === "Registry") { document.getElementById("ev-reg-path").value = ed.KeyPath || ""; document.getElementById("ev-reg-valname").value = ed.ValName || ""; document.getElementById("ev-reg-valdata").value = ed.ValData || ""; document.getElementById("ev-reg-procname").value = ed.ProcName || ""; document.getElementById("ev-reg-procid").value = ed.ProcID || ""; }
+            }
+        }
+        function getStepFormData() {
+            let n1 = document.getElementById("edit-node1").value; let n2 = document.getElementById("edit-node2").value;
+            let evType = document.getElementById("edit-event-type").value; let visualType = document.getElementById("edit-type").value;
+            let evData = {};
+            
+            if (!n1 && appData.nodes.length > 0) { n1 = appData.nodes[0].id; }
+            
+            if(evType === "Process") evData = { Name: document.getElementById("ev-proc-name").value, PID: document.getElementById("ev-proc-pid").value, Path: document.getElementById("ev-proc-path").value, PPID: document.getElementById("ev-proc-ppid").value, PPName: document.getElementById("ev-proc-pname").value };
+            else if(evType === "Process_Injection") evData = { SrcProc: document.getElementById("ev-pinj-srcproc").value, SrcPID: document.getElementById("ev-pinj-srcpid").value, DstProc: document.getElementById("ev-pinj-dstproc").value, DstPID: document.getElementById("ev-pinj-dstpid").value };
+            else if(evType === "Network") evData = { SrcIP: document.getElementById("ev-net-src").value, DstIP: document.getElementById("ev-net-dst").value, Port: document.getElementById("ev-net-port").value, Protocol: document.getElementById("ev-net-proto").value, ProcName: document.getElementById("ev-net-procname").value, ProcID: document.getElementById("ev-net-procid").value };
+            else if(evType === "File") evData = { Name: document.getElementById("ev-file-name").value, Action: document.getElementById("ev-file-action").value, Path: document.getElementById("ev-file-path").value, ProcName: document.getElementById("ev-file-procname").value, ProcID: document.getElementById("ev-file-procid").value };
+            else if(evType === "Authentication") evData = { User: document.getElementById("ev-auth-user").value, Result: document.getElementById("ev-auth-result").value, Attempts: document.getElementById("ev-auth-attempts").value, LogonType: document.getElementById("ev-auth-logontype").value };
+            else if(evType === "Service") evData = { Service: document.getElementById("ev-svc-name").value, Account: document.getElementById("ev-svc-account").value, ProcName: document.getElementById("ev-svc-procname").value, ProcID: document.getElementById("ev-svc-procid").value };
+            else if(evType === "Account") evData = { Account: document.getElementById("ev-acc-name").value, Action: document.getElementById("ev-acc-action").value, ProcName: document.getElementById("ev-acc-procname").value, ProcID: document.getElementById("ev-acc-procid").value };
+            else if(evType === "Registry") evData = { KeyPath: document.getElementById("ev-reg-path").value, ValName: document.getElementById("ev-reg-valname").value, ValData: document.getElementById("ev-reg-valdata").value, ProcName: document.getElementById("ev-reg-procname").value, ProcID: document.getElementById("ev-reg-procid").value };
+            
+            return {
+                id: Date.now().toString(), title: document.getElementById("edit-title").value, date: document.getElementById("edit-date").value, time: document.getElementById("edit-time").value,
+                tactic: document.getElementById("edit-tactic").value, action: document.getElementById("edit-action").value, desc: document.getElementById("edit-desc").value, raw: document.getElementById("edit-raw").value,
+                nodes: (n2 === "none") ? [n1] : [n1, n2], type: visualType, eventType: evType, eventData: evData
+            };
+        }
+        document.getElementById("btn-add-step").onclick = () => {
+            if(appData.nodes.length === 0) return alert("Add infrastructure nodes first!");
+            const newObj = getStepFormData(); 
+            if(!newObj.date || !newObj.time) return alert("Date and Time are required.");
+            appData.steps.push(newObj); sortScenario(); currentStep = appData.steps.findIndex(s => s.id === newObj.id); updateUI();
+        };
+        document.getElementById("btn-update-step").onclick = () => {
+            if (appData.steps.length === 0) return;
+            const updatedObj = getStepFormData(); 
+            if(!updatedObj.date || !updatedObj.time) return alert("Date and Time are required.");
+            updatedObj.id = appData.steps[currentStep].id || updatedObj.id; appData.steps[currentStep] = updatedObj;
+            sortScenario(); currentStep = appData.steps.findIndex(s => s.id === updatedObj.id); updateUI();
+        };
+        document.getElementById("btn-delete-step").onclick = () => { 
+            if (appData.steps.length > 0 && confirm("Delete this step?")) { appData.steps.splice(currentStep, 1); sortScenario(); updateUI(); } 
+        };
+        document.getElementById("btn-clear-step").onclick = () => {
+            document.getElementById("edit-title").value = ""; document.getElementById("edit-action").value = ""; document.getElementById("edit-desc").value = "";
+            document.getElementById("edit-raw").value = ""; document.getElementById("edit-node2").value = "none"; document.getElementById("edit-tactic").value = "";
+            document.getElementById("edit-event-type").value = "none"; toggleEventFields();
+            document.querySelectorAll(".dynamic-fields input").forEach(input => input.value = "");
+        };
+        document.getElementById("btn-prev").onclick = () => { if (currentStep > 0) { currentStep--; updateUI(); } };
+        document.getElementById("btn-next").onclick = () => { if (currentStep < appData.steps.length - 1) { currentStep++; updateUI(); } };
+        // --- JSON I/O ---
+        document.getElementById("btn-export-json").onclick = () => {
+            let dlNode = document.createElement('a'); dlNode.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2)));
+            dlNode.setAttribute("download", "VIPER_Project.json"); document.body.appendChild(dlNode); dlNode.click(); dlNode.remove();
+        };
+        document.getElementById("btn-import-json").onclick = () => document.getElementById("upload-json").click();
+        
+        document.getElementById("upload-json").onchange = (e) => {
+            let file = e.target.files[0]; if (!file) return;
+            let reader = new FileReader(); reader.onload = function(evt) {
+                try { 
+                    let parsed = JSON.parse(evt.target.result); 
+                    if(parsed.nodes && parsed.steps) { 
+                        appData = parsed; 
+                        
+                        // Migrate legacy 'cases' to 'reports'
+                        if (appData.cases && !appData.reports) {
+                            appData.reports = appData.cases.map(c => {
+                                 let mergedContent = "";
+                                if (c.remarks) {
+                                    c.remarks.forEach(rem => { mergedContent += `<h3>${rem.date}</h3>${rem.html}<hr>`; });
+                                }
+                                return { id: c.id, title: c.title, tags: c.tags, content: mergedContent, isLocked: false };
+                            });
+                            delete appData.cases;
+                        } else if (!appData.reports) {
+                            appData.reports = [];
+                        }
+                        sortScenario();
+                        currentStep = 0; 
+                        renderNodes(); 
+                        switchMainView('map'); 
+                        updateUI();
+                        resetZoomPan(); 
+                    } else alert("Invalid JSON format."); 
+                } catch (err) { alert("Error parsing JSON: " + err); }
+            }; reader.readAsText(file); e.target.value = null; 
+        };
+        
+        // --- STIX 2.1 EXPORT LOGIC ---
+        function generateStixId(type) {
+            return type + '--' + 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function exportStix() {
+            let stixObjects = [];
+            let nodeToStixId = {};
+            
+            appData.nodes.forEach(node => {
+                let infraId = generateStixId('infrastructure');
+                nodeToStixId[node.id] = infraId;
+                
+                let infraTypes = ["unclassified"];
+                if (['icon-server', 'icon-database'].includes(node.icon)) infraTypes = ['server'];
+                else if (node.icon === 'icon-laptop') infraTypes = ['workstation'];
+                else if (node.icon === 'icon-firewall') infraTypes = ['firewall'];
+                else if (['icon-network', 'icon-cloud'].includes(node.icon)) infraTypes = ['network-device'];
+                else if (['icon-plc', 'icon-hmi', 'icon-antenna'].includes(node.icon)) infraTypes = ['control-system'];
+                
+                stixObjects.push({
+                    type: "infrastructure", spec_version: "2.1", id: infraId,
+                    name: node.host || "Unknown Device",
+                    description: "Operating System: " + (node.os || "N/A"),
+                    infrastructure_types: infraTypes,
+                    x_viper_ui: { id: node.id, x: node.x, y: node.y, icon: node.icon, notes: node.notes }
+                });
+                
+                // Primary IP
+                if (node.ip && node.ip.includes('.')) {
+                    let ipId = generateStixId('ipv4-addr');
+                    stixObjects.push({ type: "ipv4-addr", spec_version: "2.1", id: ipId, value: node.ip });
+                    stixObjects.push({ type: "relationship", spec_version: "2.1", id: generateStixId('relationship'), relationship_type: "consists-of", source_ref: infraId, target_ref: ipId });
+                }
+                
+                // Other IPs (Aliases)
+                if (node.other_ips && node.other_ips.length > 0) {
+                    node.other_ips.forEach(oip => {
+                         if (oip.includes('.')) {
+                            let ipId = generateStixId('ipv4-addr');
+                            stixObjects.push({ type: "ipv4-addr", spec_version: "2.1", id: ipId, value: oip });
+                            stixObjects.push({ type: "relationship", spec_version: "2.1", id: generateStixId('relationship'), relationship_type: "consists-of", source_ref: infraId, target_ref: ipId });
+                         }
+                    });
+                }
+                
+                if (node.cves && node.cves.length > 0) {
+                    node.cves.forEach(cve => {
+                        let vulnId = generateStixId('vulnerability');
+                        stixObjects.push({ type: "vulnerability", spec_version: "2.1", id: vulnId, name: cve });
+                        stixObjects.push({ type: "relationship", spec_version: "2.1", id: generateStixId('relationship'), relationship_type: "has", source_ref: infraId, target_ref: vulnId });
+                    });
+                }
+            });
+            
+            appData.steps.forEach(step => {
+                let timestamp = null;
+                try {
+                    let d = new Date(step.date + "T" + (step.time.length === 8 ? step.time + ".000" : step.time) + "Z");
+                    timestamp = d.toISOString();
+                } catch(e) { timestamp = new Date().toISOString(); }
+                
+                let primaryRef = (step.nodes && step.nodes.length > 0 && step.nodes[0] !== "none") ? nodeToStixId[step.nodes[0]] : null;
+                let secondaryRef = (step.nodes && step.nodes.length > 1 && step.nodes[1] !== "none") ? nodeToStixId[step.nodes[1]] : null;
+                
+                let objRefs = [];
+                if(primaryRef) objRefs.push(primaryRef);
+                if(secondaryRef) objRefs.push(secondaryRef);
+                
+                stixObjects.push({
+                    type: "observed-data", spec_version: "2.1", id: generateStixId('observed-data'),
+                    first_observed: timestamp, last_observed: timestamp, number_observed: 1, object_refs: objRefs,
+                    x_viper_step: {
+                        title: step.title, tactic: step.tactic, action: step.action, description: step.desc, visual_type: step.type, event_type: step.eventType, event_data: step.eventData
+                    }
+                });
+                
+                if (primaryRef && secondaryRef) {
+                    let relType = "related-to";
+                    if (['external', 'internal', 'staging'].includes(step.type)) relType = "communicates-with";
+                    else if (step.type === 'exfil') relType = "exfiltrates-to";
+                    else if (step.type === 'remote_action') relType = "targets";
+                    
+                    stixObjects.push({
+                        type: "relationship", spec_version: "2.1", id: generateStixId('relationship'), relationship_type: relType, description: step.title || "Action connection", source_ref: primaryRef, target_ref: secondaryRef, start_time: timestamp, stop_time: timestamp
+                    });
+                }
+            });
+            
+            let bundle = {
+                type: "bundle", id: generateStixId('bundle'), spec_version: "2.1", objects: stixObjects
+            };
+            
+            let dlNode = document.createElement('a');
+            dlNode.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(bundle, null, 2)));
+            dlNode.setAttribute("download", "VIPER_STIX_Bundle.json");
+            document.body.appendChild(dlNode);
+            dlNode.click();
+            dlNode.remove();
+        }
+        
+        // Initialize position
+        resetZoomPan();
+        switchMainView('map');
+    </script>
+</body>
+</html>

