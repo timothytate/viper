@@ -35,6 +35,8 @@
         
         #map-tools { position: absolute; top: 10px; right: 10px; z-index: 100; display: flex; gap: 5px; background: rgba(30,30,30,0.8); padding: 5px; border-radius: 6px; border: 1px solid var(--node-border); }
         #map-tools button { padding: 4px 10px; font-size: 1rem; }
+        #map-tools .icon-btn { width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; line-height: 1; }
+        #map-tools .tool-divider { width: 1px; margin: 3px 2px; background: var(--node-border); }
         #svg-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
         .node { position: absolute; background-color: var(--node-bg); border: 2px solid var(--node-border); padding: 8px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.4); z-index: 10; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 3px; color: #fff; cursor: grab; user-select: none; transition: all 0.2s ease;}
         .node:active { cursor: grabbing; border-color: var(--accent); }
@@ -158,7 +160,6 @@
             <button onclick="switchMainView('ledger')" class="btn-warning">Ledger View</button>
             <button onclick="switchMainView('reports')" class="btn-purple">Reports</button>
             <div style="width: 2px; background: #333; margin: 0 5px;"></div>
-            <button id="btn-toggle-editor" class="btn-warning">Toggle Panel</button>
             <input type="file" id="upload-csv" accept=".csv" style="display: none;">
             <input type="file" id="upload-json" accept=".json" style="display: none;">
             <button id="btn-import-csv" class="btn-success">Import CSV</button>
@@ -175,6 +176,9 @@
                     <button onclick="setZoom(0.2)">➕</button>
                     <button onclick="setZoom(-0.2)">➖</button>
                     <button onclick="resetZoomPan()" style="font-size: 0.8rem;">Reset View</button>
+                    <span class="tool-divider" aria-hidden="true"></span>
+                    <button id="btn-toggle-editor" class="icon-btn btn-warning" type="button" aria-label="Hide attack steps and infrastructure panel" aria-pressed="true" title="Hide attack steps and infrastructure panel">❯</button>
+                    <button id="btn-toggle-step-panel" class="icon-btn btn-warning" type="button" aria-label="Hide step window" aria-pressed="true" title="Hide step window">⌄</button>
                 </div>
                 <div id="empty-state">Blank Canvas.<br><span style="font-size: 1rem">Add Infrastructure -> Add Steps</span></div>
                 <div id="map-workspace" class="anim-transform">
@@ -459,6 +463,7 @@
         let currentView = 'map';
         let currentReportId = null;
         let selectedNodeId = null;
+        let stepPanelVisible = true;
         const mapContainer = document.getElementById("map-container");
         const detailsPanel = document.getElementById("details-panel");
         const controlsPanel = document.getElementById("controls");
@@ -482,8 +487,8 @@
             reportsContainer.style.display = "none";
             if (viewType === 'map') {
                 mapContainer.style.display = "block";
-                detailsPanel.style.display = "flex";
-                controlsPanel.style.display = "flex";
+                detailsPanel.style.display = stepPanelVisible ? "flex" : "none";
+                controlsPanel.style.display = stepPanelVisible ? "flex" : "none";
                 mainTitle.textContent = "VIPER v0.2";
                 mainTitle.style.color = "var(--accent)";
                 setTimeout(() => drawSVG(), 50);
@@ -787,7 +792,7 @@
                 if(currentView === 'map') {
                     const editor = document.getElementById("editor-column");
                     if(editor.classList.contains("collapsed")) {
-                        editor.classList.remove("collapsed");
+                        setEditorPanelVisible(true);
                     }
                     switchTab('nodes');
                 }
@@ -821,7 +826,31 @@
         mapContainer.addEventListener('mousedown', (e) => { if(e.target.closest('.node') || e.target.closest('button')) return; isPanning = true; mapWorkspace.classList.remove('anim-transform'); panStartX = e.clientX - panX; panStartY = e.clientY - panY; mapContainer.style.cursor = 'grabbing'; });
         window.addEventListener('mousemove', (e) => { if(isPanning) { panX = e.clientX - panStartX; panY = e.clientY - panStartY; updateMapTransform(); } });
         window.addEventListener('mouseup', () => { if(isPanning) { isPanning = false; mapContainer.style.cursor = 'grab'; } });
-        document.getElementById("btn-toggle-editor").onclick = () => { const editor = document.getElementById("editor-column"); editor.classList.toggle("collapsed"); };
+        const editorToggleButton = document.getElementById("btn-toggle-editor");
+        const stepPanelToggleButton = document.getElementById("btn-toggle-step-panel");
+
+        function setEditorPanelVisible(isVisible) {
+            document.getElementById("editor-column").classList.toggle("collapsed", !isVisible);
+            editorToggleButton.textContent = isVisible ? "❯" : "❮";
+            editorToggleButton.setAttribute("aria-pressed", String(isVisible));
+            editorToggleButton.setAttribute("aria-label", `${isVisible ? "Hide" : "Show"} attack steps and infrastructure panel`);
+            editorToggleButton.title = editorToggleButton.getAttribute("aria-label");
+            setTimeout(() => { if(currentView === 'map') drawSVG(); }, 300);
+        }
+
+        function setStepPanelVisible(isVisible) {
+            stepPanelVisible = isVisible;
+            detailsPanel.style.display = isVisible ? "flex" : "none";
+            controlsPanel.style.display = isVisible ? "flex" : "none";
+            stepPanelToggleButton.textContent = isVisible ? "⌄" : "⌃";
+            stepPanelToggleButton.setAttribute("aria-pressed", String(isVisible));
+            stepPanelToggleButton.setAttribute("aria-label", `${isVisible ? "Hide" : "Show"} step window`);
+            stepPanelToggleButton.title = stepPanelToggleButton.getAttribute("aria-label");
+            setTimeout(() => { if(currentView === 'map') drawSVG(); }, 0);
+        }
+
+        editorToggleButton.onclick = () => setEditorPanelVisible(document.getElementById("editor-column").classList.contains("collapsed"));
+        stepPanelToggleButton.onclick = () => setStepPanelVisible(detailsPanel.style.display === "none");
         
         function switchTab(tabId) { 
             document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active")); 
