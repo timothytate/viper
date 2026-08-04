@@ -887,15 +887,18 @@
             let otherIps = Array.from(document.getElementById("node-other-ips-container").children).map(el => el.dataset.val);
             let cves = Array.from(document.getElementById("node-cve-container").children).map(el => el.dataset.val);
             
-            let payload = { 
+            const nodeFields = {
                 host: host, ip: ip, os: document.getElementById("node-os").value, 
                 icon: document.getElementById("node-icon").value, x: document.getElementById("node-x").value || 50, y: document.getElementById("node-y").value || 50,
-                notes: document.getElementById("node-notes").value,
                 other_ips: otherIps,
-                cves: cves
+                cves: cves,
+                notes: document.getElementById("node-notes").value
             };
-            if(selectedNodeId) { Object.assign(appData.nodes.find(n => n.id === selectedNodeId), payload); } 
-            else { payload.id = "node_" + Date.now(); appData.nodes.push(payload); } 
+            if(selectedNodeId) {
+                Object.assign(appData.nodes.find(n => n.id === selectedNodeId), nodeFields);
+            } else {
+                appData.nodes.push({ id: "node_" + Date.now(), ...nodeFields });
+            }
             renderNodes();
         };
         // --- ATTACK STEPS ENGINE ---
